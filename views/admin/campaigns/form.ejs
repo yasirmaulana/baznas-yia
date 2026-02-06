@@ -1,0 +1,237 @@
+<%- include('../../partials/admin_layout_start', { pageTitle: campaign ? 'Edit Campaign' : 'Create Campaign' ,
+    path: '/admin/campaigns' }) %>
+
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+
+    <div class="max-w-4xl mx-auto">
+        <form action="/admin/campaigns<%= campaign ? '/' + campaign.id + '?_method=PUT' : '' %>" method="POST"
+            enctype="multipart/form-data" id="campaignForm">
+
+            <div class="card p-6 md:p-8 space-y-6">
+
+                <!-- Title -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Campaign Title</label>
+                    <input type="text" name="title" required class="input-field text-lg font-medium"
+                        placeholder="e.g. Help Build a Mosque in..." value="<%= campaign ? campaign.title : '' %>">
+                </div>
+
+                <!-- Image Upload with Cropper -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Campaign Image (Square 1:1)</label>
+
+                    <div class="flex items-start gap-6">
+                        <!-- Preview Area -->
+                        <div class="flex-shrink-0">
+                            <div id="imagePreview"
+                                class="w-40 h-40 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative group">
+                                <% if (campaign && campaign.image) { %>
+                                    <img src="<%= campaign.image %>" class="w-full h-full object-cover">
+                                    <% } else { %>
+                                        <div class="text-gray-400 text-center p-4">
+                                            <i data-lucide="image" class="w-8 h-8 mx-auto mb-2"></i>
+                                            <span class="text-xs">No image</span>
+                                        </div>
+                                        <% } %>
+                            </div>
+                        </div>
+
+                        <!-- Input Area -->
+                        <div class="flex-1">
+                            <input type="file" id="imageInput" name="image" accept="image/*"
+                                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sage-50 file:text-sage-700 hover:file:bg-sage-100 transition-all">
+                            <p class="mt-2 text-xs text-gray-500">Upload a square image. If the image is not square, you
+                                will be prompted to crop it.</p>
+                            <div id="cropContainer"
+                                class="hidden mt-4 bg-gray-900 rounded-lg overflow-hidden max-w-md relative">
+                                <img id="cropperImage" class="max-w-full">
+                                <div class="absolute bottom-4 right-4 z-10 flex gap-2">
+                                    <button type="button" id="cropCancelBtn"
+                                        class="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700">Cancel</button>
+                                    <button type="button" id="cropConfirmBtn"
+                                        class="bg-sage-600 text-white px-3 py-1 rounded text-sm hover:bg-sage-700">Crop
+                                        & Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detail WYSIWYG -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Campaign Details</label>
+                    <div id="editor-container" class="h-64 bg-white rounded-lg"><%- campaign ? campaign.detail : '' %>
+                    </div>
+                    <input type="hidden" name="detail" id="detailInput">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Target Amount -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Target Amount (Rupiah)</label>
+                        <div class="relative">
+                            <span class="absolute left-3 top-2.5 text-gray-500 font-medium">Rp</span>
+                            <input type="number" name="targetAmount" required class="input-field pl-10" placeholder="0"
+                                value="<%= campaign ? campaign.targetAmount : '' %>">
+                        </div>
+                    </div>
+
+                    <!-- Bank Account -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Destination Bank Account</label>
+                        <div class="relative">
+                            <select name="bankAccountId" class="input-field appearance-none">
+                                <option value="">Select a Bank Account</option>
+                                <% banks.forEach(bank=> { %>
+                                    <option value="<%= bank.id %>" <%=campaign && campaign.bankAccountId==bank.id
+                                        ? 'selected' : '' %>>
+                                        <%= bank.bank %> - <%= bank.accountNumber %> (<%= bank.name %>)
+                                    </option>
+                                    <% }) %>
+                            </select>
+                            <i data-lucide="chevron-down"
+                                class="w-5 h-5 text-gray-400 absolute right-3 top-3 pointer-events-none"></i>
+                        </div>
+                    </div>
+
+                    <!-- Dates -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                        <input type="date" name="startDate" required class="input-field"
+                            value="<%= campaign ? campaign.startDate : '' %>">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                        <input type="date" name="endDate" required class="input-field"
+                            value="<%= campaign ? campaign.endDate : '' %>">
+                    </div>
+                </div>
+
+                <!-- Active Status -->
+                <div class="flex items-center gap-2 pt-2">
+                    <input type="checkbox" name="isActive" id="isActive" <%=(!campaign || campaign.isActive) ? 'checked'
+                        : '' %> class="rounded text-sage-600 focus:ring-sage-500 w-5 h-5">
+                    <label for="isActive" class="text-sm font-medium text-gray-700">Active Campaign</label>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                    <a href="/admin/campaigns" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-8">Save Campaign</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <script>
+        // --- WYSIWYG Setup ---
+        var quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Write the full story of the campaign here...',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['link', 'clean']
+                ]
+            }
+        });
+
+        document.getElementById('campaignForm').onsubmit = function () {
+            // Populate hidden input with WYSIWYG content
+            document.getElementById('detailInput').value = quill.root.innerHTML;
+            return true;
+        };
+
+
+        // --- Image Cropper Setup ---
+        const imageInput = document.getElementById('imageInput');
+        const cropContainer = document.getElementById('cropContainer');
+        const cropperImage = document.getElementById('cropperImage');
+        const imagePreview = document.getElementById('imagePreview');
+        const cropConfirmBtn = document.getElementById('cropConfirmBtn');
+        const cropCancelBtn = document.getElementById('cropCancelBtn');
+
+        let cropper;
+        let originalFile;
+
+        imageInput.addEventListener('change', function (e) {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+                const file = files[0];
+                originalFile = file;
+
+                if (file.type.match('image.*')) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        cropperImage.src = e.target.result;
+                        cropContainer.classList.remove('hidden');
+
+                        if (cropper) {
+                            cropper.destroy();
+                        }
+
+                        cropper = new Cropper(cropperImage, {
+                            aspectRatio: 1, // Force square
+                            viewMode: 1,
+                            background: false,
+                            autoCropArea: 1,
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+
+        cropConfirmBtn.addEventListener('click', function () {
+            if (!cropper) return;
+
+            // Get cropped canvas
+            const canvas = cropper.getCroppedCanvas({
+                width: 800,
+                height: 800,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high',
+            });
+
+            // Convert canvas to blob and replace the file input's file list
+            canvas.toBlob(function (blob) {
+                // Create a new File object from the blob
+                const newFile = new File([blob], originalFile.name, {
+                    type: 'image/jpeg',
+                    lastModified: Date.now()
+                });
+
+                // Create a DataTransfer to update the file input
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(newFile);
+                imageInput.files = dataTransfer.files;
+
+                // Update preview
+                imagePreview.innerHTML = `<img src="${canvas.toDataURL()}" class="w-full h-full object-cover">`;
+
+                // Hide cropper
+                cropContainer.classList.add('hidden');
+                cropper.destroy();
+                cropper = null;
+
+            }, 'image/jpeg', 0.9);
+        });
+
+        cropCancelBtn.addEventListener('click', function () {
+            cropContainer.classList.add('hidden');
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            imageInput.value = ''; // Clear input if cancelled
+        });
+
+    </script>
+
+    <%- include('../../partials/admin_layout_end') %>

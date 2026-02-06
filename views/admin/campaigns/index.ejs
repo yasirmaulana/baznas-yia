@@ -1,0 +1,103 @@
+<%- include('../../partials/admin_layout_start', { pageTitle: 'Campaign Management' , path: '/admin/campaigns' }) %>
+
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h2 class="text-lg font-semibold text-gray-800">Campaigns</h2>
+            <p class="text-sm text-gray-500">Manage fundraising campaigns.</p>
+        </div>
+        <a href="/admin/campaigns/create" class="btn btn-primary flex items-center gap-2">
+            <i data-lucide="plus"></i> Add Campaign
+        </a>
+    </div>
+
+    <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-gray-50 text-xs uppercase font-semibold text-gray-700">
+                    <tr>
+                        <th class="px-6 py-4">Image</th>
+                        <th class="px-6 py-4">Title</th>
+                        <th class="px-6 py-4">Target Amount</th>
+                        <th class="px-6 py-4">Period</th>
+                        <th class="px-6 py-4">Bank</th>
+                        <th class="px-6 py-4">Status</th>
+                        <th class="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <% campaigns.forEach(campaign=> { %>
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4">
+                                <% if(campaign.image) { %>
+                                    <img src="<%= campaign.image %>" alt=""
+                                        class="w-12 h-12 rounded-lg object-cover border border-sage-100">
+                                    <% } else { %>
+                                        <div
+                                            class="w-12 h-12 rounded-lg bg-sage-100 flex items-center justify-center text-sage-400">
+                                            <i data-lucide="image" class="w-6 h-6"></i>
+                                        </div>
+                                        <% } %>
+                            </td>
+                            <td class="px-6 py-4 font-medium text-gray-900 max-w-xs truncate"
+                                title="<%= campaign.title %>">
+                                <%= campaign.title %>
+                            </td>
+                            <td class="px-6 py-4 font-mono font-medium text-sage-700">
+                                Rp <%= new Intl.NumberFormat('id-ID').format(campaign.targetAmount) %>
+                            </td>
+                            <td class="px-6 py-4 text-xs">
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-gray-500">Start: <%= campaign.startDate %></span>
+                                    <span class="text-gray-500">End: &nbsp;<%= campaign.endDate %></span>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-xs">
+                                <% if(campaign.bankAccount) { %>
+                                    <div class="font-medium text-gray-900">
+                                        <%= campaign.bankAccount.bank %>
+                                    </div>
+                                    <div class="text-gray-500 font-mono">
+                                        <%= campaign.bankAccount.accountNumber %>
+                                    </div>
+                                    <% } else { %>
+                                        <span class="text-gray-400 italic">No Bank</span>
+                                        <% } %>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= campaign.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                                    <%= campaign.isActive ? 'Active' : 'Inactive' %>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="/admin/campaigns/<%= campaign.id %>/edit"
+                                        class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        title="Edit">
+                                        <i data-lucide="pencil" class="w-4 h-4"></i>
+                                    </a>
+                                    <form action="/admin/campaigns/<%= campaign.id %>?_method=DELETE" method="POST"
+                                        onsubmit="return confirm('Are you sure? This cannot be undone.')"
+                                        class="inline">
+                                        <button type="submit"
+                                            class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                            title="Delete">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <% }) %>
+                            <% if(campaigns.length===0) { %>
+                                <tr>
+                                    <td colspan="7" class="px-6 py-12 text-center text-gray-500">No campaigns found.
+                                        Click "Add Campaign" to create one.</td>
+                                </tr>
+                                <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <%- include('../../partials/admin_layout_end') %>

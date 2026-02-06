@@ -1,0 +1,104 @@
+<%- include('../partials/front_header') %>
+
+    <style>
+        nav.sticky {
+            display: none !important;
+        }
+    </style>
+
+    <div class="bg-white min-h-screen flex flex-col pb-20">
+        <!-- Header -->
+        <header class="sticky top-0 z-50 bg-white border-b border-gray-50 px-4 py-3 flex items-center gap-4">
+            <a href="/profile" class="p-2 hover:bg-gray-50 rounded-full transition-colors">
+                <i data-lucide="arrow-left" class="w-5 h-5 text-gray-700"></i>
+            </a>
+            <h1 class="text-sm font-bold text-gray-900">Riwayat Fundraising</h1>
+        </header>
+
+        <main class="flex-grow p-4 space-y-6">
+            <!-- Stats Summary -->
+            <div class="grid grid-cols-2 gap-4">
+                <div class="bg-tarahum-50/50 border border-tarahum-100 rounded-2xl p-4">
+                    <p class="text-[9px] font-bold text-tarahum-600 uppercase tracking-wider mb-1">Total Terkumpul</p>
+                    <p class="text-xs font-extrabold text-gray-900 font-mono tracking-tight">
+                        <%= totalCollected %>
+                    </p>
+                </div>
+                <div class="bg-teal-50/50 border border-teal-100 rounded-2xl p-4">
+                    <p class="text-[9px] font-bold text-teal-600 uppercase tracking-wider mb-1">Total Donatur</p>
+                    <p class="text-xs font-extrabold text-gray-900">
+                        <%= totalDonors %>
+                    </p>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <h2 class="text-xs font-bold text-gray-900 px-1">Daftar Donatur Referal</h2>
+
+                <% if (donations.length===0) { %>
+                    <div class="flex flex-col items-center justify-center py-20 text-center space-y-4">
+                        <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center">
+                            <i data-lucide="users" class="w-10 h-10 text-gray-300"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-gray-900">Belum Ada Donatur</h3>
+                            <p class="text-[11px] text-gray-400 mt-1 max-w-[200px] mx-auto">Bagikan link referal Anda
+                                untuk mulai mengajak kebaikan.</p>
+                        </div>
+                        <a href="/campaigns"
+                            class="bg-tarahum-500 text-white text-[11px] font-bold px-6 py-2.5 rounded-xl text-center">Cari
+                            Program</a>
+                    </div>
+                    <% } else { %>
+                        <div class="space-y-3">
+                            <% donations.forEach(donation=> { %>
+                                <div class="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm">
+                                    <div class="flex items-start justify-between mb-3">
+                                        <div class="flex items-center gap-3">
+                                            <div
+                                                class="w-8 h-8 rounded-full bg-tarahum-50 flex items-center justify-center text-tarahum-500">
+                                                <i data-lucide="user" class="w-4 h-4"></i>
+                                            </div>
+                                            <div>
+                                                <h4 class="text-[11px] font-bold text-gray-900">
+                                                    <%= donation.donorName %>
+                                                </h4>
+                                                <p class="text-[9px] text-gray-400">
+                                                    <%= donation.date %>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <% if (donation.status===1) { %>
+                                            <span
+                                                class="text-[9px] font-bold text-yellow-500 bg-yellow-50 px-2 py-0.5 rounded-lg">Menunggu</span>
+                                            <% } else if (donation.status===2) { %>
+                                                <span
+                                                    class="text-[9px] font-bold text-green-500 bg-green-50 px-2 py-0.5 rounded-lg">Berhasil</span>
+                                                <% } else { %>
+                                                    <span
+                                                        class="text-[9px] font-bold text-red-400 bg-red-50 px-2 py-0.5 rounded-lg">Dibatalkan</span>
+                                                    <% } %>
+                                    </div>
+                                    <div class="pl-11 pt-3 border-t border-gray-50 flex items-center justify-between">
+                                        <div class="min-w-0 flex-grow pr-4">
+                                            <p class="text-[9px] text-gray-400 mb-0.5">Program:</p>
+                                            <h5 class="text-[10px] font-medium text-gray-700 line-clamp-1">
+                                                <%= donation.campaign ? donation.campaign.title : 'Program Terhapus' %>
+                                            </h5>
+                                        </div>
+                                        <div class="text-right flex-shrink-0">
+                                            <p class="text-[9px] text-gray-400 mb-0.5">Besar Donasi:</p>
+                                            <p class="text-[11px] font-extrabold text-tarahum-500 tracking-tight">
+                                                <%= donation.formattedAmount %>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <% }) %>
+                        </div>
+                        <% } %>
+            </div>
+        </main>
+    </div>
+
+    <%- include('../partials/front_footer') %>

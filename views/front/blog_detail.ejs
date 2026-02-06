@@ -1,0 +1,82 @@
+<%- include('../partials/front_header') %>
+
+    <div class="bg-white min-h-screen pb-20">
+        <!-- Sticky Header -->
+        <header class="sticky top-0 z-50 bg-white border-b border-gray-50 px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="/blog" class="p-2 hover:bg-gray-50 rounded-full transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5 text-gray-700"></i>
+                </a>
+                <h1 class="text-sm font-bold text-gray-900 line-clamp-1">
+                    <%= post.title %>
+                </h1>
+            </div>
+            <button class="p-2 hover:bg-gray-50 rounded-full transition-colors" onclick="copyUrl()">
+                <i data-lucide="share-2" class="w-5 h-5 text-gray-400"></i>
+            </button>
+        </header>
+
+        <main class="max-w-[480px] mx-auto overflow-hidden">
+            <!-- Article Cover -->
+            <% if(post.image) { %>
+                <div class="w-full aspect-video bg-gray-100 overflow-hidden">
+                    <img src="<%= post.image %>" alt="<%= post.title %>" class="w-full h-full object-cover">
+                </div>
+                <% } %>
+
+                    <div class="px-6 py-8">
+                        <!-- Meta -->
+                        <div class="flex items-center gap-3 mb-6">
+                            <span
+                                class="bg-tarahum-50 text-tarahum-500 text-[10px] font-bold px-3 py-1 rounded-full uppercase">
+                                Portal Ilmu
+                            </span>
+                            <span
+                                class="text-[11px] text-gray-400 flex items-center gap-1.5 border-l border-gray-100 pl-3">
+                                <i data-lucide="calendar" class="w-3.5 h-3.5"></i>
+                                <%= post.formattedDate %>
+                            </span>
+                        </div>
+
+                        <!-- Title -->
+                        <h1 class="text-2xl font-extrabold text-gray-900 leading-tight mb-8">
+                            <%= post.title %>
+                        </h1>
+
+                        <!-- Content -->
+                        <article class="prose prose-sm prose-gray max-w-none text-gray-600 leading-relaxed text-[13px]">
+                            <%- post.content %>
+                        </article>
+
+                        <!-- Footer Meta -->
+                        <div class="mt-12 pt-8 border-t border-gray-50 flex items-center justify-between">
+                            <div class="flex items-center gap-2">
+                                <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
+                                    <i data-lucide="user" class="w-5 h-5 text-gray-400"></i>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] text-gray-400">Ditulis oleh:</p>
+                                    <p class="text-[11px] font-bold text-gray-900">Tim Amalan Baik</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Navigation -->
+                        <div class="mt-10 grid grid-cols-1 gap-4">
+                            <a href="/blog"
+                                class="flex items-center justify-center gap-2 py-4 bg-gray-50 text-gray-700 font-bold text-xs rounded-2xl border border-gray-100 active:scale-95 transition-all">
+                                <i data-lucide="arrow-left" class="w-4 h-4"></i> Kembali ke Ilmu Portal
+                            </a>
+                        </div>
+                    </div>
+        </main>
+    </div>
+
+    <script>
+        function copyUrl() {
+            navigator.clipboard.writeText(window.location.href);
+            alert('Link artikel berhasil disalin!');
+        }
+    </script>
+
+    <%- include('../partials/front_footer') %>

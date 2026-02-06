@@ -1,0 +1,117 @@
+<%- include('../../partials/admin_layout_start', { pageTitle: 'Send Broadcast' , path: '/admin/whatsapp' }) %>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- Broadcast Form -->
+        <div class="lg:col-span-2">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+                    <i data-lucide="send" class="w-5 h-5 text-sage-600"></i> New Broadcast
+                </h2>
+
+                <form action="/admin/whatsapp/broadcast" method="POST">
+                    <div class="space-y-6">
+                        <!-- Session Select -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Send From</label>
+                            <select name="sessionName" required class="input-field">
+                                <% if(sessions.length===0) { %>
+                                    <option value="" disabled selected>No active sessions found (Scan QR first)</option>
+                                    <% } else { %>
+                                        <% sessions.forEach(s=> { %>
+                                            <option value="<%= s.sessionName %>">
+                                                <%= s.sessionName %> (<%= s.phoneNumber || 'Connected' %>)
+                                            </option>
+                                            <% }) %>
+                                                <% } %>
+                            </select>
+                        </div>
+
+                        <!-- Targets -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Target Numbers</label>
+                            <p class="text-xs text-gray-400 mb-2">Separate multiple numbers with commas. Example:
+                                08123456789, 628987654321</p>
+                            <textarea name="numbers" required rows="3" class="input-field font-mono text-sm"
+                                placeholder="081..., 082..."></textarea>
+                        </div>
+
+                        <!-- Message -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                            <textarea name="message" required rows="6" class="input-field"
+                                placeholder="Type your message here..."></textarea>
+                        </div>
+
+                        <div class="pt-4 border-t border-gray-100 flex justify-end gap-3">
+                            <a href="/admin/whatsapp" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-8" <%=sessions.length===0 ? 'disabled' : ''
+                                %>>
+                                Queue Broadcast
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Job History -->
+        <div class="lg:col-span-1">
+            <div class="card p-6 h-full">
+                <h3 class="font-bold text-gray-800 mb-4 flex items-center justify-between">
+                    <span>Recent Jobs</span>
+                    <span class="text-xs font-normal text-gray-500">Auto-refreshing...</span>
+                </h3>
+
+                <div class="space-y-4">
+                    <% jobs.forEach(job=> { %>
+                        <div class="p-3 rounded-lg border border-gray-100 bg-gray-50">
+                            <div class="flex justify-between items-start mb-2">
+                                <span class="text-xs font-mono font-bold text-gray-500">#<%= job.id %></span>
+                                <% if(job.status==='completed' ) { %>
+                                    <span
+                                        class="text-[10px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold uppercase">Sent</span>
+                                    <% } else if (job.status==='failed' ) { %>
+                                        <span
+                                            class="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-bold uppercase">Failed</span>
+                                        <% } else { %>
+                                            <span
+                                                class="text-[10px] bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded font-bold uppercase">
+                                                <%= job.status %>
+                                            </span>
+                                            <% } %>
+                            </div>
+                            <div class="text-sm font-medium text-gray-800 mb-1 truncate">
+                                To: <%= job.payload.target %>
+                            </div>
+                            <% if(job.result) { %>
+                                <div class="text-xs text-gray-500 truncate" title="<%= job.result %>">
+                                    <%= job.result %>
+                                </div>
+                                <% } %>
+                                    <div class="mt-2 text-[10px] text-gray-400 text-right">
+                                        <%= new Date(job.createdAt).toLocaleTimeString() %>
+                                    </div>
+                        </div>
+                        <% }) %>
+
+                            <% if(jobs.length===0) { %>
+                                <div class="text-center text-gray-400 text-sm py-4">No recent jobs.</div>
+                                <% } %>
+                </div>
+
+                <script>
+                    // Simple auto-refresh for status checking
+                    setInterval(() => {
+                        // Only reload if we are not typing
+                        if (document.activeElement.tagName !== 'TEXTAREA') {
+                            // window.location.reload(); 
+                            // Actually better not to full reload to avoid losing input, skipping for now
+                        }
+                    }, 10000);
+                </script>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../../partials/admin_layout_end') %>

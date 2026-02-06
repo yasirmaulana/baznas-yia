@@ -1,0 +1,100 @@
+<%- include('../partials/admin_layout_start') %>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-lg font-bold text-gray-800">Media Library</h2>
+                <p class="text-xs text-gray-500">Manage your uploaded images</p>
+            </div>
+            <div>
+                <form action="/admin/media/upload" method="POST" enctype="multipart/form-data"
+                    class="flex items-center gap-2">
+                    <label for="imageUpload"
+                        class="cursor-pointer bg-sage-500 hover:bg-sage-600 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center gap-2 transition-colors">
+                        <i data-lucide="upload" class="w-4 h-4"></i>
+                        Upload New
+                    </label>
+                    <input type="file" name="image" id="imageUpload" accept="image/*" class="hidden"
+                        onchange="this.form.submit()">
+                </form>
+            </div>
+        </div>
+
+        <% if (error) { %>
+            <div
+                class="bg-red-50 text-red-600 p-4 rounded-lg mb-6 text-sm font-medium border border-red-100 flex items-center gap-2">
+                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                <%= error %>
+            </div>
+            <% } %>
+
+                <% if (success) { %>
+                    <div
+                        class="bg-green-50 text-green-600 p-4 rounded-lg mb-6 text-sm font-medium border border-green-100 flex items-center gap-2">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        <%= success %>
+                    </div>
+                    <% } %>
+
+                        <% if (images.length===0) { %>
+                            <div class="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                                <div
+                                    class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                                    <i data-lucide="image" class="w-8 h-8"></i>
+                                </div>
+                                <h3 class="text-sm font-bold text-gray-900 mb-1">No images found</h3>
+                                <p class="text-xs text-gray-500">Upload your first image to get started</p>
+                            </div>
+                            <% } else { %>
+                                <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+                                    <% images.forEach(image=> { %>
+                                        <div
+                                            class="group relative bg-gray-50 rounded-lg border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+                                            <div class="aspect-square relative bg-white">
+                                                <img src="<%= image.url %>" alt="<%= image.name %>"
+                                                    class="w-full h-full object-contain p-2">
+
+                                                <!-- Actions Overlay -->
+                                                <div
+                                                    class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                    <button onclick="copyUrl('<%= image.url %>')"
+                                                        class="p-2 bg-white rounded-full text-gray-700 hover:text-sage-600 transition-colors"
+                                                        title="Copy URL">
+                                                        <i data-lucide="copy" class="w-4 h-4"></i>
+                                                    </button>
+                                                    <form action="/admin/media/delete" method="POST"
+                                                        onsubmit="return confirm('Are you sure you want to delete this image?');">
+                                                        <input type="hidden" name="filename" value="<%= image.name %>">
+                                                        <button type="submit"
+                                                            class="p-2 bg-white rounded-full text-gray-700 hover:text-red-600 transition-colors"
+                                                            title="Delete">
+                                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                                        </button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <div class="p-2 bg-white border-t border-gray-100">
+                                                <p class="text-[10px] font-medium text-gray-700 truncate"
+                                                    title="<%= image.name %>">
+                                                    <%= image.name %>
+                                                </p>
+                                                <p class="text-[9px] text-gray-400">
+                                                    <%= image.size %>
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <% }) %>
+                                </div>
+                                <% } %>
+    </div>
+
+    <script>
+        function copyUrl(url) {
+            const fullUrl = window.location.origin + url;
+            navigator.clipboard.writeText(fullUrl).then(() => {
+                alert('Image URL copied to clipboard!');
+            });
+        }
+    </script>
+
+    <%- include('../partials/admin_layout_end') %>

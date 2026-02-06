@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= pageTitle %> - Amalan
+    </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        tarahum: {
+                            50: '#f0fbf9',
+                            100: '#dcf6f2',
+                            200: '#bae8e2',
+                            300: '#8ed5cd',
+                            400: '#64bbb3',
+                            500: '#3dcef5',
+                            600: '#3da499',
+                            footer: '#2a5753'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style type="text/tailwindcss">
+        @layer base { body { @apply font-sans bg-gray-50; } }
+        .mobile-container { @apply max-w-[480px] mx-auto bg-white min-h-screen shadow-2xl relative flex flex-col; }
+    </style>
+</head>
+
+<body class="bg-gray-100 antialiased">
+    <div class="mobile-container">
+        <!-- Sticky Header with Back Button -->
+        <header class="sticky top-0 z-50 bg-white border-b border-gray-50 px-4 py-3 flex items-center gap-4">
+            <a href="javascript:history.back()" class="p-2 hover:bg-gray-50 rounded-full transition-colors">
+                <i data-lucide="arrow-left" class="w-5 h-5 text-gray-700"></i>
+            </a>
+            <h1 class="text-sm font-bold text-gray-900 line-clamp-1">
+                <%= campaign.title %>
+            </h1>
+        </header>
+
+        <main class="flex-grow pb-24">
+
+            <!-- Hero Image Area -->
+            <section class="relative">
+                <div class="aspect-video w-full overflow-hidden">
+                    <img src="<%= campaign.image || 'https://via.placeholder.com/800x450?text=Campaign+Image' %>"
+                        alt="<%= campaign.title %>" class="w-full h-full object-cover">
+                </div>
+            </section>
+
+            <!-- Basic Info -->
+            <section class="px-4 py-4 bg-white">
+                <h1 class="text-sm font-bold text-gray-900 mb-2 leading-tight">
+                    <%= campaign.title %>
+                </h1>
+                <div class="space-y-3 mb-6">
+                    <div class="flex justify-between items-end text-[10px] text-gray-400 font-medium">
+                        <span>Collected</span>
+                        <span class="font-bold text-gray-600">
+                            <%= campaign.percentage %>%
+                        </span>
+                    </div>
+
+                    <div class="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
+                        <div class="bg-[#3dcef5] h-full rounded-full transition-all duration-1000"
+                            style="width: <%= campaign.percentage %>%"></div>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm font-bold text-[#3dcef5]">
+                            <%= campaign.formattedCurrent %>
+                        </span>
+                        <span class="text-[10px] text-gray-400 font-medium">
+                            Target: <%= campaign.formattedTarget %>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Social Share Icons -->
+                <div class="flex justify-end gap-2 mb-6 text-white text-[10px] font-bold">
+                    <a href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(campaign.fullUrl) %>"
+                        target="_blank" class="w-7 h-7 bg-[#3b5998] rounded flex items-center justify-center">
+                        <i data-lucide="facebook" class="w-4 h-4"></i>
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?url=<%= encodeURIComponent(campaign.fullUrl) %>&text=<%= encodeURIComponent(campaign.title) %>"
+                        target="_blank" class="w-7 h-7 bg-black rounded flex items-center justify-center">
+                        <i data-lucide="twitter" class="w-4 h-4"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/sharing/share-offsite/?url=<%= encodeURIComponent(campaign.fullUrl) %>"
+                        target="_blank" class="w-7 h-7 bg-[#0077b5] rounded flex items-center justify-center">
+                        <i data-lucide="linkedin" class="w-4 h-4"></i>
+                    </a>
+                    <a href="https://t.me/share/url?url=<%= encodeURIComponent(campaign.fullUrl) %>&text=<%= encodeURIComponent(campaign.title) %>"
+                        target="_blank" class="w-7 h-7 bg-[#0088cc] rounded flex items-center justify-center">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                    </a>
+                    <a href="https://wa.me/?text=<%= encodeURIComponent(campaign.title + ' ' + campaign.fullUrl) %>"
+                        target="_blank" class="w-7 h-7 bg-[#25d366] rounded flex items-center justify-center">
+                        <i data-lucide="message-circle" class="w-4 h-4"></i>
+                    </a>
+                </div>
+
+                <!-- Tabs -->
+                <div class="flex border-b border-gray-100 mb-6">
+                    <button class="flex-1 py-2.5 text-[11px] font-bold text-white bg-tarahum-500 rounded-t-lg">
+                        <i data-lucide="info" class="w-3 h-3 inline mr-1"></i> Informasi
+                    </button>
+                    <button
+                        class="flex-1 py-2.5 text-[11px] font-bold text-gray-500 bg-gray-50 rounded-t-lg border-x border-t border-gray-100">
+                        <i data-lucide="file-text" class="w-3 h-3 inline mr-1"></i> Laporan
+                    </button>
+                </div>
+
+                <!-- Verified Container -->
+                <div class="border border-gray-100 rounded-xl p-4 mb-6">
+                    <!-- <div class="flex items-center gap-2 mb-4">
+                <div
+                    class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-300 text-[8px] font-bold">
+                    KH/AS
+                </div>
+                <div class="flex items-center gap-1 text-[10px] text-emerald-500 font-bold">
+                    <i data-lucide="shield-check" class="w-3 h-3"></i>
+                    Identitas terverifikasi
+                </div>
+            </div> -->
+
+                    <!-- Description -->
+                    <div class="prose prose-sm max-w-none text-[11px] text-gray-600 leading-relaxed font-normal">
+                        <%- campaign.detail %>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Fundraiser Section -->
+            <section class="py-4 border-t border-gray-100">
+                <div class="px-4 flex justify-between items-center mb-4">
+                    <h2 class="text-xs font-bold text-gray-900">Fundraiser</h2>
+                    <a href="#" class="text-[10px] font-medium text-tarahum-500">Lihat Semua</a>
+                </div>
+                <!-- Fundraiser Section (Conditional) -->
+                <% if (fundraisers && fundraisers.length> 0) { %>
+                    <div class="px-4 space-y-4 mb-8">
+                        <!-- <h3 class="text-[11px] font-bold text-gray-900 uppercase tracking-wider mb-4">Fundraiser</h3> -->
+                        <% fundraisers.forEach(fundraiser=> { %>
+                            <div
+                                class="flex gap-3 items-center bg-white p-3 rounded-2xl border border-gray-100 shadow-sm">
+                                <img src="<%= fundraiser.avatar %>" alt="<%= fundraiser.name %>"
+                                    class="w-8 h-8 rounded-full object-cover">
+                                <div class="flex-grow">
+                                    <p class="text-[10px] font-bold text-gray-900">
+                                        <%= fundraiser.name %>
+                                    </p>
+                                    <p class="text-[9px] text-gray-400">Mengajak <%= fundraiser.count %> orang berdonasi
+                                    </p>
+                                    <p class="text-[10px] font-bold text-gray-900">
+                                        <%= fundraiser.formattedAmount %>
+                                    </p>
+                                </div>
+                            </div>
+                            <% }) %>
+                    </div>
+                    <% } %>
+
+                        <!-- CTA Fundraiser Section (Separate) -->
+                        <div class="px-4 mb-8">
+                            <div
+                                class="bg-teal-50/50 rounded-2xl p-5 flex gap-4 items-center border border-teal-100/50">
+                                <div
+                                    class="w-16 h-16 flex-shrink-0 bg-white rounded-xl flex items-center justify-center p-2 shadow-sm">
+                                    <img src="https://cdn-icons-png.flaticon.com/512/3781/3781974.png" alt="Icon"
+                                        class="w-full h-full object-contain">
+                                </div>
+                                <div class="flex-grow">
+                                    <h4 class="text-[10px] font-bold text-gray-900 mb-1">Yuk jadi Fundraiser Program
+                                        ini!</h4>
+                                    <p class="text-[8px] text-gray-500 mb-3 leading-tight">
+                                        Insya Allah setiap dukungan yang terkumpul akan menjadi pahala jariyah yang
+                                        terus
+                                        mengalir.
+                                    </p>
+                                    <% if (isLoggedIn) { %>
+                                        <div class="flex gap-2">
+                                            <input type="text" readonly
+                                                value="<%= campaign.fullUrl %>?ref=<%= user.username || userId %>"
+                                                id="refLink"
+                                                class="flex-grow text-[9px] px-3 py-1.5 bg-white border border-gray-100 rounded-lg focus:outline-none overflow-hidden text-ellipsis">
+                                            <button onclick="copyToClipboard(document.getElementById('refLink').value)"
+                                                class="text-[9px] font-bold text-white px-3 py-1.5 bg-[#3dcef5] rounded-lg shadow-sm active:scale-95 transition-all whitespace-nowrap">
+                                                Salin Link
+                                            </button>
+                                        </div>
+                                        <% } else { %>
+                                            <a href="/login?returnTo=<%= campaign.fullUrl %>"
+                                                class="inline-block text-[9px] font-bold text-[#3dcef5] px-4 py-1.5 bg-white border border-[#3dcef5]/20 rounded-lg shadow-sm active:scale-95 transition-all">
+                                                Jadi Fundraiser
+                                            </a>
+                                            <% } %>
+                                </div>
+                            </div>
+                        </div>
+            </section>
+
+            <!-- Donatur Section -->
+            <section class="py-4 border-t border-gray-100 pb-24">
+                <div class="px-4 flex justify-between items-center mb-6">
+                    <h2 class="text-xs font-bold text-gray-900">Donatur</h2>
+                    <a href="#" class="text-[10px] font-medium text-tarahum-500">Lihat Semua</a>
+                </div>
+
+                <div class="px-4 space-y-6">
+                    <% donations.forEach(donation=> { %>
+                        <div class="flex gap-3 items-start border-b border-gray-50 pb-4 last:border-0">
+                            <div class="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center text-gray-300">
+                                <i data-lucide="user" class="w-5 h-5"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <div class="flex justify-between items-center mb-0.5">
+                                    <span class="text-[10px] font-bold text-gray-900">
+                                        <%= donation.name %>
+                                    </span>
+                                    <span class="text-[10px] font-bold text-tarahum-500">
+                                        <%= donation.formattedAmount %>
+                                    </span>
+                                </div>
+                                <p class="text-[9px] text-gray-400 mb-2">
+                                    <%= donation.timeAgo %>
+                                </p>
+                                <% if(donation.pray) { %>
+                                    <div
+                                        class="bg-gray-50 px-3 py-2 rounded-xl text-[10px] text-gray-600 leading-relaxed italic border border-gray-100">
+                                        "<%= donation.pray %>"
+                                    </div>
+                                    <% } %>
+                            </div>
+                        </div>
+                        <% }) %>
+                </div>
+            </section>
+
+            <!-- Bottom Action Button (Fixed) -->
+            <div
+                class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white border-t border-gray-100 px-4 py-3 z-[60]">
+                <button onclick="document.getElementById('donationModal').classList.remove('hidden')"
+                    class="w-full bg-[#3dcef5] text-white font-bold py-3 text-xs rounded-xl flex items-center justify-center gap-2 shadow-lg active:scale-95 transition-transform">
+                    <i data-lucide="heart" class="w-4 h-4 fill-current"></i> Donasi Sekarang
+                </button>
+            </div>
+
+            <!-- Donation Modal (Hidden by default) -->
+            <div id="donationModal" class="fixed inset-0 bg-black/50 z-[100] hidden flex items-end justify-center">
+                <div
+                    class="bg-white w-full max-w-[480px] rounded-t-3xl p-6 animate-in slide-in-from-bottom duration-300 max-h-[90vh] overflow-y-auto">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-gray-900 text-sm">Masukan Nominal Sedekah</h3>
+                        <button onclick="document.getElementById('donationModal').classList.add('hidden')"
+                            class="text-gray-400">
+                            <i data-lucide="x" class="w-5 h-5"></i>
+                        </button>
+                    </div>
+
+                    <form action="/campaign/<%= campaign.id %>/donate" method="POST" class="space-y-4">
+                        <div class="relative">
+                            <span
+                                class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">Rp</span>
+                            <input type="number" name="amount" required min="1000"
+                                class="w-full pl-12 pr-4 py-4 bg-gray-50 border-0 rounded-2xl font-bold text-lg text-tarahum-600 focus:ring-2 focus:ring-tarahum-500 outline-none"
+                                placeholder="0">
+                        </div>
+
+                        <div class="grid grid-cols-4 gap-2">
+                            <button type="button" onclick="document.getElementsByName('amount')[0].value=10000"
+                                class="py-2 text-[10px] font-bold border border-gray-100 rounded-lg text-gray-600 hover:bg-tarahum-50 hover:text-tarahum-500">10k</button>
+                            <button type="button" onclick="document.getElementsByName('amount')[0].value=50000"
+                                class="py-2 text-[10px] font-bold border border-gray-100 rounded-lg text-gray-600 hover:bg-tarahum-50 hover:text-tarahum-500">50k</button>
+                            <button type="button" onclick="document.getElementsByName('amount')[0].value=100000"
+                                class="py-2 text-[10px] font-bold border border-gray-100 rounded-lg text-gray-600 hover:bg-tarahum-50 hover:text-tarahum-500">100k</button>
+                            <button type="button" onclick="document.getElementsByName('amount')[0].value=500000"
+                                class="py-2 text-[10px] font-bold border border-gray-100 rounded-lg text-gray-600 hover:bg-tarahum-50 hover:text-tarahum-500">500k</button>
+                        </div>
+
+                        <div class="py-2">
+                            <% if (user) { %>
+                                <div class="text-xs text-gray-600 mb-2">
+                                    Masuk sebagai <span class="font-bold text-tarahum-500">
+                                        <%= user.name %>
+                                    </span>
+                                </div>
+                                <% } else { %>
+                                    <div class="text-[11px] text-gray-600 font-medium">
+                                        <a href="/login?returnTo=<%= campaign.fullUrl %>"
+                                            class="font-bold text-tarahum-500 underline">Masuk</a> atau lengkapi data
+                                        dibawah ini:
+                                    </div>
+                                    <% } %>
+                        </div>
+
+                        <div class="space-y-4">
+                            <% if (user) { %>
+                                <input type="hidden" name="donorName" value="<%= user.name %>">
+                                <input type="hidden" name="whatsapp" value="<%= user.phone %>">
+                                <% } else { %>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-gray-700 mb-1">Nama Lengkap <span
+                                                class="text-red-500">*</span></label>
+                                        <input type="text" name="donorName" required placeholder="Nama lengkap"
+                                            class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-xs focus:ring-tarahum-500 outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-gray-700 mb-1">Email <span
+                                                class="text-gray-400 font-normal">(Opsional)</span></label>
+                                        <input type="email" name="email"
+                                            placeholder="Alamat Email Anda (Boleh dikosongkan)"
+                                            class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-xs focus:ring-tarahum-500 outline-none">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-gray-700 mb-1">Telepon <span
+                                                class="text-red-500">*</span></label>
+                                        <input type="tel" name="whatsapp" required placeholder="Nomor Telepon"
+                                            class="w-full px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-xs focus:ring-tarahum-500 outline-none">
+                                    </div>
+                                    <% } %>
+
+                                        <div class="pt-2 border-t border-gray-50">
+                                            <div class="flex items-center justify-between mb-3">
+                                                <label for="isAnony" class="text-[10px] text-gray-600">Sembunyikan nama
+                                                    saya (Donasi Anonim)</label>
+                                                <input type="checkbox" name="isAnonymous" id="isAnony"
+                                                    class="rounded text-tarahum-500 w-4 h-4 border-gray-300 focus:ring-tarahum-500">
+                                            </div>
+                                            <div class="flex items-center justify-between">
+                                                <label for="isPray" class="text-[10px] text-gray-600">Seutas Do'a
+                                                    (Opsional)</label>
+                                                <input type="checkbox" id="isPray"
+                                                    onchange="document.getElementById('prayInput').classList.toggle('hidden')"
+                                                    class="rounded text-tarahum-500 w-4 h-4 border-gray-300 focus:ring-tarahum-500">
+                                            </div>
+                                            <textarea name="pray" id="prayInput" rows="2"
+                                                placeholder="Tulis doa atau pesan..."
+                                                class="hidden w-full mt-3 px-4 py-3 bg-gray-50 border border-gray-100 rounded-xl text-xs focus:ring-tarahum-500 resize-none outline-none"></textarea>
+                                        </div>
+
+                                        <button type="submit"
+                                            class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-bold py-4 rounded-xl text-sm shadow-sm transition-all active:scale-[0.98]">
+                                            Donasi Sekarang
+                                        </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+
+            <script>
+                function copyToClipboard(text) {
+                    navigator.clipboard.writeText(text).then(() => {
+                        alert('Link referral berhasil disalin!');
+                    });
+                }
+            </script>
+
+        </main>
+    </div>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
+
+<%- include('../partials/front_footer') %>

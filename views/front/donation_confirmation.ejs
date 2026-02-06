@@ -1,0 +1,82 @@
+<%- include('../partials/front_header') %>
+
+    <div class="bg-white py-6 flex items-center justify-center px-4">
+        <div class="max-w-md w-full bg-white overflow-hidden">
+
+            <!-- Header -->
+            <div class="bg-tarahum-500 p-8 text-center">
+                <div
+                    class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/20 backdrop-blur mb-4 text-white">
+                    <i data-lucide="check" class="w-8 h-8"></i>
+                </div>
+                <h1 class="text-2xl font-bold text-white mb-2">Pendaftaran Donasi Berhasil</h1>
+                <p class="text-white/80 text-sm">Harap selesaikan pembayaran dalam waktu 24 jam.</p>
+            </div>
+
+            <div class="p-2 space-y-6">
+
+                <!-- Amount Section -->
+                <div class="text-center space-y-1">
+                    <p class="text-sm text-gray-500 font-medium">Total Nominal Transfer</p>
+                    <div class="text-3xl font-bold text-gray-900 tracking-tight flex items-center justify-center gap-1">
+                        <span class="text-base font-medium text-gray-500 mt-1">Rp</span>
+                        <%= donation.formattedTotal.replace('Rp', '' ).trim() %>
+                            <button onclick="copyToClipboard('<%= donation.totalAmount %>')"
+                                class="ml-2 text-tarahum-500 hover:text-tarahum-700 p-2 hover:bg-tarahum-50 rounded transition-colors"
+                                title="Salin Nominal">
+                                <i data-lucide="copy" class="w-5 h-5"></i>
+                            </button>
+                    </div>
+                    <!-- Highlight Unique Code -->
+                    <p
+                        class="text-xs text-orange-600 bg-orange-50 inline-block px-3 py-1 rounded-full font-medium border border-orange-100">
+                        Penting: Transfer sesuai nominal hingga digit terakhir (Kode Unik: <%= donation.uniqueCode %>)
+                    </p>
+                </div>
+
+                <!-- QRIS Payment Section -->
+                <div class="bg-gray-50 rounded-xl p-6 border border-gray-100">
+                    <div class="text-center mb-4">
+                        <div class="text-sm text-gray-500 mb-2">Scan QRIS untuk Pembayaran</div>
+                        <div class="font-bold text-gray-900 mb-4">BAZNAS - YIA</div>
+                    </div>
+
+                    <div class="bg-white rounded-lg p-4 border border-gray-200">
+                        <img src="/images/qris-baznas-yia.jpg" alt="QRIS BAZNAS YIA" class="w-full h-auto">
+                    </div>
+
+                    <div class="mt-4 text-xs text-gray-500 text-center">
+                        Scan QR Code di atas menggunakan aplikasi mobile banking atau e-wallet Anda
+                    </div>
+                </div>
+
+                <!-- WhatsApp Confirmation Button -->
+                <a href="https://wa.me/6283822819609?text=Halo,%20saya%20ingin%20konfirmasi%20tentang%20pembayaran%20<%= encodeURIComponent(donation.campaign.title) %>"
+                    target="_blank"
+                    class="block w-full bg-green-500 hover:bg-green-600 text-white font-bold py-4 px-6 rounded-xl transition-all active:scale-[0.98] text-center flex items-center justify-center gap-2">
+                    <i data-lucide="message-circle" class="w-5 h-5"></i>
+                    <span>Konfirmasi via WhatsApp</span>
+                </a>
+
+                <!-- Timer / Expiry -->
+                <div
+                    class="flex items-center justify-center gap-2 text-[11px] text-gray-500 bg-yellow-50 p-3 rounded-lg border border-yellow-100">
+                    <i data-lucide="clock" class="w-4 h-4 text-yellow-600"></i>
+                    <span>Bayar sebelum <span class="font-semibold text-gray-700">
+                            <%= donation.expiryDate %>
+                        </span></span>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Account number copied!');
+            });
+        }
+    </script>
+
+    <%- include('../partials/front_footer') %>

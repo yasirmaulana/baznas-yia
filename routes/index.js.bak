@@ -1,0 +1,165 @@
+const express = require('express');
+const router = express.Router();
+const Campaign = require('../models/Campaign');
+const Donation = require('../models/Donation');
+const BankAccount = require('../models/BankAccount');
+const slugify = require('slugify');
+const { Op } = require('sequelize');
+
+// Helper for currency formatting
+const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+};
+
+// Helper for masking phone number (e.g., 0812****789)
+const maskPhone = (phone) => {
+    if (!phone || phone.length < 8) return phone;
+    return phone.substring(0, 4) + '****' + phone.substring(phone.length - 3);
+};
+
+// Helper for Percentage
+const calculatePercentage = (current, target) => {
+    if (!target || target == 0) return 0;
+    const percent = (current / target) * 100;
+    return Math.min(percent, 100).toFixed(0);
+};
+
+// --- ROUTES ---
+
+router.get('/', async (req, res) => {
+    const campaigns = await Campaign.findAll({
+        where: { isActive: true },
+        order: [['createdAt', 'DESC']],
+        limit: 6,
+        include: [{ model: Donation, as: 'donations', where: { status: 2 }, required: false }]
+    });
+
+    res.render('front/home', {
+        pageTitle: 'Home',
+        campaigns: campaigns.map(c => {
+            const collected = c.donations ? c.donations.reduce((sum, d) => sum + parseFloat(d.amount), 0) : 0;
+            return {
+                ...c.toJSON(),
+                slug: slugify(c.title, { lower: true, strict: true }),
+                formattedTarget: formatCurrency(c.targetAmount),
+                currentAmount: collected,
+                formattedCurrent: formatCurrency(collected),
+                percentage: calculatePercentage(collected, c.targetAmount)
+            };
+        })
+    });
+});
+
+router.get('/blog', (req, res) => {
+    res.render('front/blog', { pageTitle: 'Blog' });
+});
+
+// Campaign Detail
+router.get('/campaign/:slug', async (req, res) => {
+    const match = req.params.slug.match(/^(\d+)-/);
+    if (!match) return res.redirect('/');
+
+    const id = match[1];
+
+    // Fetch Campaign with Bank Account
+    const campaign = await Campaign.findByPk(id, {
+        include: [
+            { model: BankAccount, as: 'bankAccount' }
+        ]
+    });
+
+    if (!campaign || !campaign.isActive) return res.redirect('/');
+
+    // Fetch Confirmed Donations
+    const donations = await Donation.findAll({
+        where: { campaignId: id, status: 2 }, // Only confirmed
+        order: [['createdAt', 'DESC']],
+        limit: 10
+    });
+
+    const totalCollected = await Donation.sum('amount', {
+        where: { campaignId: id, status: 2 }
+    }) || 0;
+
+    res.render('front/campaign_detail', {
+        pageTitle: campaign.title,
+        campaign: {
+            ...campaign.toJSON(),
+            slug: slugify(campaign.title, { lower: true, strict: true }),
+            formattedTarget: formatCurrency(campaign.targetAmount),
+            currentAmount: totalCollected,
+            formattedCurrent: formatCurrency(totalCollected),
+            percentage: calculatePercentage(totalCollected, campaign.targetAmount)
+        },
+        donations: donations.map(d => ({
+            ...d.toJSON(),
+            name: d.isAnonymous ? 'Hamba Allah' : d.donorName,
+            formattedAmount: formatCurrency(d.amount),
+            timeAgo: new Date(d.createdAt).toLocaleDateString() // Simplification
+        }))
+    });
+});
+
+// Process Donation
+router.post('/campaign/:id/donate', async (req, res) => {
+    try {
+        const campaignId = req.params.id;
+        const { donorName, whatsapp, amount, pray, isAnonymous } = req.body;
+
+        // Clean amount (remove generic non-numeric except dot/comma if needed, but simple parse int is fine for now)
+        const cleanAmount = parseFloat(amount.toString().replace(/[^0-9]/g, ''));
+
+        if (!cleanAmount || cleanAmount < 1000) {
+            // Should handle error better, but redirecting back for now
+            return res.redirect('back');
+        }
+
+        const uniqueCode = Math.floor(Math.random() * 999) + 1;
+        const totalAmount = cleanAmount + uniqueCode;
+
+        const donation = await Donation.create({
+            campaignId,
+            donorName,
+            whatsapp,
+            amount: cleanAmount,
+            uniqueCode,
+            totalAmount,
+            pray,
+            isAnonymous: isAnonymous === 'on',
+            status: 1 // Waiting
+        });
+
+        res.redirect(`/donation/confirmation/${donation.id}`);
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error processing donation");
+    }
+});
+
+// Confirmation Page
+router.get('/donation/confirmation/:id', async (req, res) => {
+    const donation = await Donation.findByPk(req.params.id, {
+        include: [
+            {
+                model: Campaign,
+                as: 'campaign',
+                include: [{ model: BankAccount, as: 'bankAccount' }]
+            }
+        ]
+    });
+
+    if (!donation) return res.redirect('/');
+
+    res.render('front/donation_confirmation', {
+        pageTitle: 'Donation Confirmation',
+        donation: {
+            ...donation.toJSON(),
+            formattedAmount: formatCurrency(donation.amount),
+            formattedTotal: formatCurrency(donation.totalAmount),
+            expiryDate: new Date(donation.createdAt.getTime() + 24 * 60 * 60 * 1000).toLocaleString() // 24 hours expiry
+        }
+    });
+});
+
+module.exports = router;

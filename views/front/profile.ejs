@@ -1,0 +1,190 @@
+<%- include('../partials/front_header') %>
+
+    <style>
+        /* Hide the default global nav ONLY on the profile page to match image */
+        nav.sticky {
+            display: none !important;
+        }
+
+        main.flex-grow {
+            padding-bottom: 0px !important;
+        }
+    </style>
+
+    <div class="bg-white min-h-screen flex flex-col">
+        <!-- Custom Header -->
+        <header class="flex items-center px-4 py-4 border-b border-gray-50">
+            <a href="/" class="p-1">
+                <i data-lucide="arrow-left" class="w-6 h-6 text-gray-900"></i>
+            </a>
+            <h1 class="ml-4 text-lg font-extrabold text-gray-900">Akun</h1>
+        </header>
+
+        <div class="p-4 space-y-8">
+            <!-- User Profile Info -->
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-4">
+                    <div
+                        class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center border border-gray-200">
+                        <% let initials='U' ; if (user && user.name) {
+                            initials=user.name.split(' ').map(function(n) { return n[0]; }).join('').toUpperCase().substring(0, 2);
+                            } else if (user && user.email) {
+                                initials = user.email[0].toUpperCase();
+                            }
+                        %>
+                        <span class="text-gray-900 font-bold text-sm"><%= initials %></span>
+                    </div>
+                    <div>
+                        <h2 class="text-sm font-bold text-gray-900 leading-tight">
+                            <%= user.name || ' Hamba Allah' %>
+                            </h2>
+                            <p class="text-[11px] text-gray-400">
+                                <%= user.email %>
+                            </p>
+                    </div>
+                </div>
+                <a href="/profile/edit" class="p-2">
+                    <i data-lucide="edit-3" class="w-5 h-5 text-gray-900"></i>
+                </a>
+            </div>
+
+            <!-- Wallet Card -->
+            <!-- <div
+                class="bg-white border border-gray-50 rounded-2xl p-4 shadow-xl shadow-gray-100 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-tarahum-50 rounded-xl flex items-center justify-center">
+                        <div class="w-6 h-6 bg-tarahum-500 rounded-lg flex items-center justify-center text-white">
+                            <i data-lucide="shopping-bag" class="w-4 h-4"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-gray-400 font-medium">Saldo Saku Kebaikan</p>
+                        <p class="text-sm font-extrabold text-gray-900">Rp 0</p>
+                    </div>
+                </div>
+                <button
+                    class="bg-tarahum-500 hover:bg-tarahum-600 text-white text-[11px] font-bold px-4 py-2 rounded-xl transition-all active:scale-95 flex items-center gap-1.5">
+                    <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    Isi saldo
+                </button>
+            </div> -->
+
+            <!-- Menu Section: Akun Saya -->
+            <section class="space-y-4">
+                <h3 class="text-sm font-bold text-gray-900 px-1">Akun Saya</h3>
+                <div class="space-y-1">
+                    <% if(user.role==='admin' ) { %>
+                        <a href="/admin/dashboard"
+                            class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-2xl transition-all group">
+                            <div class="flex items-center gap-4">
+                                <i data-lucide="layout-grid"
+                                    class="w-5 h-5 text-gray-400 group-hover:text-tarahum-500"></i>
+                                <span class="text-[12px] font-medium text-gray-600">Dashboard Admin</span>
+                            </div>
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+                        </a>
+                        <% } %>
+                            <a href="/profile/donasi-saya"
+                                class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-2xl transition-all group">
+                                <div class="flex items-center gap-4">
+                                    <i data-lucide="shopping-bag"
+                                        class="w-5 h-5 text-gray-400 group-hover:text-tarahum-500"></i>
+                                    <span class="text-[12px] font-medium text-gray-600">Donasi Saya</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+                            </a>
+                            <!-- <a href="/profile/sedekah-rutin"
+                                class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-2xl transition-all group">
+                                <div class="flex items-center gap-4">
+                                    <i data-lucide="refresh-cw"
+                                        class="w-5 h-5 text-gray-400 group-hover:text-tarahum-500"></i>
+                                    <span class="text-[12px] font-medium text-gray-600">Sedekah Rutin</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+                            </a> -->
+                            <a href="/profile/fundraising"
+                                class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-2xl transition-all group">
+                                <div class="flex items-center gap-4">
+                                    <i data-lucide="users"
+                                        class="w-5 h-5 text-gray-400 group-hover:text-tarahum-500"></i>
+                                    <span class="text-[12px] font-medium text-gray-600">Fundraising</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+                            </a>
+                            <!-- <a href="/profile/pengaturan"
+                                class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-2xl transition-all group last:border-0 border-b border-gray-50">
+                                <div class="flex items-center gap-4">
+                                    <i data-lucide="settings"
+                                        class="w-5 h-5 text-gray-400 group-hover:text-tarahum-500"></i>
+                                    <span class="text-[12px] font-medium text-gray-600">Pengaturan</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+                            </a> -->
+                </div>
+            </section>
+
+            <!-- Menu Section: Seputar Amalan -->
+            <section class="space-y-4 pt-4">
+                <h3 class="text-sm font-bold text-gray-900 px-1">Seputar Amalan Baik</h3>
+                <div class="space-y-1 border-t border-gray-50 pt-2">
+                    <a href="/about"
+                        class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-2xl transition-all group">
+                        <div class="flex items-center gap-4">
+                            <i data-lucide="info" class="w-5 h-5 text-gray-400 group-hover:text-tarahum-500"></i>
+                            <span class="text-[12px] font-medium text-gray-600">Tentang Kami</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+                    </a>
+                    <a href="/contact"
+                        class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-2xl transition-all group">
+                        <div class="flex items-center gap-4">
+                            <i data-lucide="phone" class="w-5 h-5 text-gray-400 group-hover:text-tarahum-500"></i>
+                            <span class="text-[12px] font-medium text-gray-600">Kontak Kami</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+                    </a>
+                    <a href="/terms"
+                        class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-2xl transition-all group">
+                        <div class="flex items-center gap-4">
+                            <i data-lucide="file-text" class="w-5 h-5 text-gray-400 group-hover:text-tarahum-500"></i>
+                            <span class="text-[12px] font-medium text-gray-600">Syarat & Ketentuan</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+                    </a>
+                    <a href="/privacy"
+                        class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-2xl transition-all group border-b border-gray-50 pb-4">
+                        <div class="flex items-center gap-4">
+                            <i data-lucide="shield" class="w-5 h-5 text-gray-400 group-hover:text-tarahum-500"></i>
+                            <span class="text-[12px] font-medium text-gray-600">Kebijakan Privasi</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+                    </a>
+                    <a href="/faq"
+                        class="flex items-center justify-between p-3 hover:bg-gray-50 rounded-2xl transition-all group">
+                        <div class="flex items-center gap-4">
+                            <i data-lucide="help-circle" class="w-5 h-5 text-gray-400 group-hover:text-tarahum-500"></i>
+                            <span class="text-[12px] font-medium text-gray-600">Tanya Jawab</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-300"></i>
+                    </a>
+
+                    <!-- Logout -->
+                    <a href="/logout"
+                        class="flex items-center justify-between p-3 hover:bg-red-50 rounded-2xl transition-all group mt-4">
+                        <div class="flex items-center gap-4">
+                            <i data-lucide="log-out" class="w-5 h-5 text-red-400"></i>
+                            <span class="text-[12px] font-bold text-red-500">Keluar</span>
+                        </div>
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-red-200"></i>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Footer Logo & Copyright -->
+            <footer class="pt-12 pb-8 flex flex-col items-center justify-center space-y-4 opacity-50">
+                <p class="text-[9px] text-gray-500 font-medium">© 2026 Baitul Maal Katulistiwa Beji</p>
+            </footer>
+        </div>
+    </div>
+
+    <%- include('../partials/front_footer') %>

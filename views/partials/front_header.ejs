@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= locals.pageTitle ? pageTitle + ' - Amalan' : 'Amalan App' %>
+    </title>
+
+    <% if (locals.og) { %>
+        <meta property="og:title" content="<%= og.title %>" />
+        <meta property="og:description" content="<%= og.description %>" />
+        <meta property="og:image" content="<%= og.image %>" />
+        <meta property="og:url" content="<%= og.url %>" />
+        <meta property="og:type" content="website" />
+        <% } %>
+            <script src="https://cdn.tailwindcss.com"></script>
+            <script>
+                tailwind.config = {
+                    theme: {
+                        extend: {
+                            colors: {
+                                tarahum: {
+                                    50: '#f0fbf9',
+                                    100: '#dcf6f2',
+                                    200: '#bae8e2',
+                                    300: '#8ed5cd',
+                                    400: '#64bbb3',
+                                    500: '#3dcef5', // Brand Color
+                                    600: '#3da499',
+                                    700: '#35847d',
+                                    800: '#2f6964',
+                                    900: '#2a5753',
+                                },
+                                sage: {
+                                    50: '#f4f7f4',
+                                    100: '#e3ebe3',
+                                    200: '#c5d6c5',
+                                    300: '#a3bfa3',
+                                    400: '#7f9f7f',
+                                    500: '#8a9a5b',
+                                    600: '#6d7a48',
+                                    700: '#545f39',
+                                    800: '#3e462d',
+                                    900: '#2c3122',
+                                }
+                            },
+                            fontFamily: {
+                                sans: ['Inter', 'sans-serif'],
+                            }
+                        }
+                    }
+                }
+            </script>
+            <style type="text/tailwindcss">
+                @layer components {
+            .btn {
+                @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200;
+            }
+            .btn-primary {
+                @apply bg-tarahum-500 text-white hover:bg-tarahum-600;
+            }
+            .btn-secondary {
+                @apply bg-white text-tarahum-600 border border-tarahum-200 hover:bg-tarahum-50;
+            }
+            .input-field {
+                @apply w-full px-4 py-2 rounded-lg border border-gray-300 focus:ring-2 focus:ring-tarahum-500 focus:border-tarahum-500 outline-none transition-all;
+            }
+            .card {
+                @apply bg-white rounded-xl shadow-sm border border-gray-100;
+            }
+            .mobile-view {
+                @apply max-w-[480px] mx-auto bg-white min-h-screen shadow-2xl relative;
+            }
+        }
+        /* Custom scrollbar hiding */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+                rel="stylesheet">
+            <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="bg-gray-100 text-gray-800 font-sans antialiased">
+    <div class="mobile-view flex flex-col">
+        <nav class="bg-tarahum-500 sticky top-0 z-50 px-4 py-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-1">
+                        <img src="/images/baznas-yia-logo.png" alt="Baznas YIA" class="h-8">
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <!-- Placeholder for potential right icons -->
+                </div>
+            </div>
+        </nav>
+        <main class="flex-grow pb-20"> <!-- pb-20 for bottom nav -->

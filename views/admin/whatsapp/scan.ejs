@@ -1,0 +1,40 @@
+<%- include('../../partials/admin_layout_start', { pageTitle: 'Scan QR Code' , path: '/admin/whatsapp' }) %>
+
+    <div class="max-w-md mx-auto mt-8">
+        <div class="card p-8 text-center">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Scan QR Code</h2>
+            <p class="text-gray-500 mb-8">Open WhatsApp on your phone > Linked Devices > Link a Device</p>
+
+            <div class="flex justify-center mb-8">
+                <% if (qrDataURL) { %>
+                    <div class="bg-white p-4 rounded-xl shadow-lg border border-gray-100">
+                        <img src="<%= qrDataURL %>" alt="QR Code" class="w-64 h-64 object-contain">
+                    </div>
+                    <% } else { %>
+                        <div
+                            class="w-64 h-64 bg-gray-100 rounded-xl flex items-center justify-center text-gray-400 flex-col gap-2">
+                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-sage-600"></div>
+                            <span class="text-sm">Generating QR...</span>
+                        </div>
+                        <script>
+                            // Auto-refresh page every 3 seconds to check for QR
+                            setTimeout(() => window.location.reload(), 3000);
+                        </script>
+                        <% } %>
+            </div>
+
+            <div class="text-sm text-gray-400 mb-6">
+                Session: <span class="font-mono text-gray-600">
+                    <%= session.sessionName %>
+                </span>
+            </div>
+
+            <div class="space-y-3">
+                <a href="/admin/whatsapp/scan/<%= session.sessionName %>" class="btn btn-secondary w-full">Refresh
+                    QR</a>
+                <a href="/admin/whatsapp" class="block text-sage-600 hover:underline">Back to Sessions</a>
+            </div>
+        </div>
+    </div>
+
+    <%- include('../../partials/admin_layout_end') %>

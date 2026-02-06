@@ -1,0 +1,37 @@
+<%- include('../partials/admin_layout_start', { pageTitle: 'Dashboard' , path: '/admin/dashboard' }) %>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="card p-6 flex items-center gap-4">
+            <div class="p-4 rounded-full bg-sage-100 text-sage-600">
+                <i data-lucide="users" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 font-medium">Total Users</p>
+                <h3 class="text-2xl font-bold text-gray-800">
+                    <%= counts.users %>
+                </h3>
+            </div>
+        </div>
+        <div class="card p-6 flex items-center gap-4">
+            <div class="p-4 rounded-full bg-blue-100 text-blue-600">
+                <i data-lucide="credit-card" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <p class="text-sm text-gray-500 font-medium">Bank Accounts</p>
+                <h3 class="text-2xl font-bold text-gray-800">
+                    <%= counts.banks %>
+                </h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-8 text-center py-20">
+        <div class="inline-flex justify-center items-center w-16 h-16 rounded-full bg-sage-50 mb-6">
+            <i data-lucide="layout-dashboard" class="w-8 h-8 text-sage-500"></i>
+        </div>
+        <h2 class="text-xl font-bold text-gray-800 mb-2">Welcome to the Dashboard</h2>
+        <p class="text-gray-500 max-w-md mx-auto">Select an option from the sidebar to manage users or bank accounts.
+        </p>
+    </div>
+
+    <%- include('../partials/admin_layout_end') %>

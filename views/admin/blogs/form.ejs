@@ -1,0 +1,187 @@
+<%- include('../../partials/admin_layout_start', { pageTitle: post ? 'Edit Post' : 'Create Post' , path: '/admin/blogs'
+    }) %>
+
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+
+    <div class="max-w-4xl mx-auto">
+        <form action="/admin/blogs<%= post ? '/' + post.id + '?_method=PUT' : '' %>" method="POST"
+            enctype="multipart/form-data" id="postForm">
+
+            <div class="card p-6 md:p-8 space-y-6">
+
+                <!-- Title -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Post Title</label>
+                    <input type="text" name="title" required class="input-field text-lg font-medium"
+                        placeholder="e.g. 10 Ways to Increase Amal" value="<%= post ? post.title : '' %>">
+                </div>
+
+                <!-- Image Upload with Cropper -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Cover Image</label>
+
+                    <div class="space-y-4">
+                        <!-- Preview Area -->
+                        <div
+                            class="w-full h-64 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative group">
+                            <div id="imagePreview" class="w-full h-full flex items-center justify-center">
+                                <% if (post && post.image) { %>
+                                    <img src="<%= post.image %>" class="w-full h-full object-cover">
+                                    <% } else { %>
+                                        <div class="text-gray-400 text-center p-4">
+                                            <i data-lucide="image" class="w-12 h-12 mx-auto mb-2"></i>
+                                            <span class="text-sm">Click below to upload</span>
+                                        </div>
+                                        <% } %>
+                            </div>
+                        </div>
+
+                        <!-- Input Area -->
+                        <div class="">
+                            <input type="file" id="imageInput" name="image" accept="image/*"
+                                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-sage-50 file:text-sage-700 hover:file:bg-sage-100 transition-all">
+                            <div id="cropContainer"
+                                class="hidden mt-4 bg-gray-900 rounded-lg overflow-hidden relative h-[500px]">
+                                <img id="cropperImage" class="max-w-full">
+                                <div class="absolute bottom-4 right-4 z-10 flex gap-2">
+                                    <button type="button" id="cropCancelBtn"
+                                        class="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700">Cancel</button>
+                                    <button type="button" id="cropConfirmBtn"
+                                        class="bg-sage-600 text-white px-3 py-1 rounded text-sm hover:bg-sage-700">Crop
+                                        & Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Content WYSIWYG -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Content</label>
+                    <div id="editor-container" class="h-96 bg-white rounded-lg"><%- post ? post.content : '' %></div>
+                    <input type="hidden" name="content" id="contentInput">
+                </div>
+
+                <!-- Publish Status -->
+                <div class="flex items-center gap-2 pt-2">
+                    <input type="checkbox" name="isPublished" id="isPublished" <%=(!post || post.isPublished)
+                        ? 'checked' : '' %> class="rounded text-sage-600 focus:ring-sage-500 w-5 h-5">
+                    <label for="isPublished" class="text-sm font-medium text-gray-700">Publish Immediately</label>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                    <a href="/admin/blogs" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-8">Save Post</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
+    <script>
+        // --- WYSIWYG Setup ---
+        var quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Write your article here...',
+            modules: {
+                toolbar: [
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote', 'code-block'],
+                    [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                    [{ 'color': [] }, { 'background': [] }],
+                    ['link', 'image'],
+                    ['clean']
+                ]
+            }
+        });
+
+        document.getElementById('postForm').onsubmit = function () {
+            document.getElementById('contentInput').value = quill.root.innerHTML;
+            return true;
+        };
+
+
+        // --- Image Cropper Setup ---
+        const imageInput = document.getElementById('imageInput');
+        const cropContainer = document.getElementById('cropContainer');
+        const cropperImage = document.getElementById('cropperImage');
+        const imagePreview = document.getElementById('imagePreview');
+        const cropConfirmBtn = document.getElementById('cropConfirmBtn');
+        const cropCancelBtn = document.getElementById('cropCancelBtn');
+
+        let cropper;
+        let originalFile;
+
+        imageInput.addEventListener('change', function (e) {
+            const files = e.target.files;
+            if (files && files.length > 0) {
+                const file = files[0];
+                originalFile = file;
+
+                if (file.type.match('image.*')) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        cropperImage.src = e.target.result;
+                        cropContainer.classList.remove('hidden');
+
+                        if (cropper) {
+                            cropper.destroy();
+                        }
+
+                        cropper = new Cropper(cropperImage, {
+                            aspectRatio: 16 / 9, // Blog posts usually look better wide
+                            viewMode: 1,
+                            background: false,
+                            autoCropArea: 1,
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            }
+        });
+
+        cropConfirmBtn.addEventListener('click', function () {
+            if (!cropper) return;
+
+            const canvas = cropper.getCroppedCanvas({
+                width: 1200,
+                height: 675,
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high',
+            });
+
+            canvas.toBlob(function (blob) {
+                const newFile = new File([blob], originalFile.name, {
+                    type: 'image/jpeg',
+                    lastModified: Date.now()
+                });
+
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(newFile);
+                imageInput.files = dataTransfer.files;
+
+                imagePreview.innerHTML = `<img src="${canvas.toDataURL()}" class="w-full h-full object-cover">`;
+
+                cropContainer.classList.add('hidden');
+                cropper.destroy();
+                cropper = null;
+
+            }, 'image/jpeg', 0.9);
+        });
+
+        cropCancelBtn.addEventListener('click', function () {
+            cropContainer.classList.add('hidden');
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            imageInput.value = '';
+        });
+    </script>
+
+    <%- include('../../partials/admin_layout_end') %>

@@ -1,0 +1,162 @@
+<%- include('../../partials/admin_layout_start', { pageTitle: 'Bank Accounts' , path: '/admin/banks' }) %>
+
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h2 class="text-lg font-semibold text-gray-800">Bank Accounts</h2>
+            <p class="text-sm text-gray-500">Manage donation bank accounts.</p>
+        </div>
+        <button onclick="document.getElementById('addBankModal').classList.remove('hidden')"
+            class="btn btn-primary flex items-center gap-2">
+            <i data-lucide="plus"></i> Add Account
+        </button>
+    </div>
+
+    <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-gray-50 text-xs uppercase font-semibold text-gray-700">
+                    <tr>
+                        <th class="px-6 py-4">ID</th>
+                        <th class="px-6 py-4">Bank Name</th>
+                        <th class="px-6 py-4">Account Name</th>
+                        <th class="px-6 py-4">Account Number</th>
+                        <th class="px-6 py-4">Status</th>
+                        <th class="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <% banks.forEach(bank=> { %>
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 font-medium text-gray-900">#<%= bank.id %>
+                            </td>
+                            <td class="px-6 py-4 font-medium">
+                                <%= bank.bank %>
+                            </td>
+                            <td class="px-6 py-4">
+                                <%= bank.name %>
+                            </td>
+                            <td class="px-6 py-4 font-mono">
+                                <%= bank.accountNumber %>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= bank.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                                    <%= bank.isActive ? 'Active' : 'Inactive' %>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button
+                                        onclick="editBank('<%= bank.id %>', '<%= bank.bank %>', '<%= bank.name %>', '<%= bank.accountNumber %>', <%= bank.isActive %>)"
+                                        class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        title="Edit">
+                                        <i data-lucide="pencil" class="w-4 h-4"></i>
+                                    </button>
+                                    <form action="/admin/banks/delete/<%= bank.id %>?_method=DELETE" method="POST"
+                                        onsubmit="return confirm('Are you sure?')" class="inline">
+                                        <button type="submit"
+                                            class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                            title="Delete">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <% }) %>
+                            <% if(banks.length===0) { %>
+                                <tr>
+                                    <td colspan="6" class="px-6 py-8 text-center text-gray-500">No bank accounts found.
+                                    </td>
+                                </tr>
+                                <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add Bank Modal -->
+    <div id="addBankModal"
+        class="fixed inset-0 bg-gray-900/50 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Add Bank Account</h3>
+            <form action="/admin/banks" method="POST">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
+                        <input type="text" name="bank" required class="input-field" placeholder="e.g. BCA">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Account Holder Name</label>
+                        <input type="text" name="name" required class="input-field">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+                        <input type="text" name="accountNumber" required class="input-field">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" name="isActive" value="true" checked
+                            class="rounded text-sage-600 focus:ring-sage-500">
+                        <label class="text-sm text-gray-700">Active Service</label>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('addBankModal').classList.add('hidden')"
+                        class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Bank Modal -->
+    <div id="editBankModal"
+        class="fixed inset-0 bg-gray-900/50 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Edit Bank Account</h3>
+            <form id="editBankForm" method="POST">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bank Name</label>
+                        <input type="text" name="bank" id="editBankName" required class="input-field">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Account Holder Name</label>
+                        <input type="text" name="name" id="editHolderName" required class="input-field">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Account Number</label>
+                        <input type="text" name="accountNumber" id="editAccountNumber" required class="input-field">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" name="isActive" value="true" id="editIsActive"
+                            class="rounded text-sage-600 focus:ring-sage-500">
+                        <label class="text-sm text-gray-700">Active Service</label>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('editBankModal').classList.add('hidden')"
+                        class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update Account</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function editBank(id, bank, name, accountNumber, isActive) {
+            const modal = document.getElementById('editBankModal');
+            const form = document.getElementById('editBankForm');
+
+            document.getElementById('editBankName').value = bank;
+            document.getElementById('editHolderName').value = name;
+            document.getElementById('editAccountNumber').value = accountNumber;
+            document.getElementById('editIsActive').checked = isActive;
+
+            form.action = `/admin/banks/${id}?_method=PUT`;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    </script>
+
+    <%- include('../../partials/admin_layout_end') %>

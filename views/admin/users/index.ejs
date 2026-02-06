@@ -1,0 +1,146 @@
+<%- include('../../partials/admin_layout_start', { pageTitle: 'User Management' , path: '/admin/users' }) %>
+
+    <div class="mb-6 flex justify-between items-center">
+        <div>
+            <h2 class="text-lg font-semibold text-gray-800">Users List</h2>
+            <p class="text-sm text-gray-500">Manage system users and access.</p>
+        </div>
+        <button onclick="document.getElementById('addUserModal').classList.remove('hidden')"
+            class="btn btn-primary flex items-center gap-2">
+            <i data-lucide="plus"></i> Add User
+        </button>
+    </div>
+
+    <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm text-gray-600">
+                <thead class="bg-gray-50 text-xs uppercase font-semibold text-gray-700">
+                    <tr>
+                        <th class="px-6 py-4">ID</th>
+                        <th class="px-6 py-4">Email</th>
+                        <th class="px-6 py-4">Status</th>
+                        <th class="px-6 py-4">Created At</th>
+                        <th class="px-6 py-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <% users.forEach(user=> { %>
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-6 py-4 font-medium text-gray-900">#<%= user.id %>
+                            </td>
+                            <td class="px-6 py-4">
+                                <%= user.email %>
+                            </td>
+                            <td class="px-6 py-4">
+                                <span
+                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= user.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                                    <%= user.isActive ? 'Active' : 'Inactive' %>
+                                </span>
+                            </td>
+                            <td class="px-6 py-4">
+                                <%= new Date(user.createdAt).toLocaleDateString() %>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <button
+                                        onclick="editUser('<%= user.id %>', '<%= user.email %>', <%= user.isActive %>)"
+                                        class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        title="Edit">
+                                        <i data-lucide="pencil" class="w-4 h-4"></i>
+                                    </button>
+                                    <form action="/admin/users/delete/<%= user.id %>?_method=DELETE" method="POST"
+                                        onsubmit="return confirm('Are you sure?')" class="inline">
+                                        <button type="submit"
+                                            class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                            title="Delete">
+                                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <% }) %>
+                            <% if(users.length===0) { %>
+                                <tr>
+                                    <td colspan="5" class="px-6 py-8 text-center text-gray-500">No users found.</td>
+                                </tr>
+                                <% } %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Add User Modal -->
+    <div id="addUserModal"
+        class="fixed inset-0 bg-gray-900/50 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6 transform transition-all scale-100">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Add New User</h3>
+            <form action="/admin/users" method="POST">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" name="email" required class="input-field">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" name="password" required class="input-field">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" name="isActive" value="true" checked
+                            class="rounded text-sage-600 focus:ring-sage-500">
+                        <label class="text-sm text-gray-700">Active Account</label>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('addUserModal').classList.add('hidden')"
+                        class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal"
+        class="fixed inset-0 bg-gray-900/50 hidden items-center justify-center z-50 p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+            <h3 class="text-xl font-bold text-gray-800 mb-4">Edit User</h3>
+            <form id="editUserForm" method="POST">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <input type="email" name="email" id="editEmail" required class="input-field">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">New Password (leave blank to
+                            keep)</label>
+                        <input type="password" name="password" class="input-field">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" name="isActive" value="true" id="editIsActive"
+                            class="rounded text-sage-600 focus:ring-sage-500">
+                        <label class="text-sm text-gray-700">Active Account</label>
+                    </div>
+                </div>
+                <div class="mt-6 flex justify-end gap-3">
+                    <button type="button" onclick="document.getElementById('editUserModal').classList.add('hidden')"
+                        class="btn btn-secondary">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Update User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function editUser(id, email, isActive) {
+            const modal = document.getElementById('editUserModal');
+            const form = document.getElementById('editUserForm');
+            document.getElementById('editEmail').value = email;
+            document.getElementById('editIsActive').checked = isActive;
+            form.action = `/admin/users/${id}?_method=PUT`;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+    </script>
+
+    <%- include('../../partials/admin_layout_end') %>

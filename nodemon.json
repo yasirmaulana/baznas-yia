@@ -1,0 +1,27 @@
+{
+  "restartable": "rs",
+  "ignore": [
+    ".git",
+    "node_modules",
+    "public",
+    "whatsapp_sessions/**",
+    "whatsapp_sessions",
+    "*.log"
+  ],
+  "verbose": true,
+  "execMap": {
+    "js": "node"
+  },
+  "events": {
+    "restart": "osascript -e 'display notification \"App restarted due to changes\" with title \"nodemon\"'"
+  },
+  "watch": [
+    "views",
+    "routes",
+    "models",
+    "lib",
+    "index.js",
+    "worker.js"
+  ],
+  "ext": "js,json"
+}

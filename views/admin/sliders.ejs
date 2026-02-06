@@ -1,0 +1,236 @@
+<%- include('../partials/admin_layout_start') %>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h2 class="text-lg font-bold text-gray-800">Slider Management</h2>
+                <p class="text-xs text-gray-500">Manage home page banner sliders</p>
+            </div>
+            <button onclick="document.getElementById('createModal').classList.remove('hidden')"
+                class="bg-sage-500 hover:bg-sage-600 text-white font-bold py-2 px-4 rounded-lg text-sm flex items-center gap-2 transition-colors">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                Add New Slider
+            </button>
+        </div>
+
+        <% if (error) { %>
+            <div
+                class="bg-red-50 text-red-600 p-4 rounded-lg mb-6 text-sm font-medium border border-red-100 flex items-center gap-2">
+                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                <%= error %>
+            </div>
+            <% } %>
+
+                <% if (success) { %>
+                    <div
+                        class="bg-green-50 text-green-600 p-4 rounded-lg mb-6 text-sm font-medium border border-green-100 flex items-center gap-2">
+                        <i data-lucide="check-circle" class="w-4 h-4"></i>
+                        <%= success %>
+                    </div>
+                    <% } %>
+
+                        <% if (sliders.length===0) { %>
+                            <div class="text-center py-12 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                                <div
+                                    class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                                    <i data-lucide="image" class="w-8 h-8"></i>
+                                </div>
+                                <h3 class="text-sm font-bold text-gray-900 mb-1">No sliders found</h3>
+                                <p class="text-xs text-gray-500">Create your first slider to get started</p>
+                            </div>
+                            <% } else { %>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full">
+                                        <thead class="bg-gray-50 border-b border-gray-200">
+                                            <tr>
+                                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-700">Preview
+                                                </th>
+                                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-700">Title
+                                                </th>
+                                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-700">Link
+                                                </th>
+                                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-700">Order
+                                                </th>
+                                                <th class="px-4 py-3 text-left text-xs font-bold text-gray-700">Status
+                                                </th>
+                                                <th class="px-4 py-3 text-right text-xs font-bold text-gray-700">Actions
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-gray-100">
+                                            <% sliders.forEach(slider=> { %>
+                                                <tr class="hover:bg-gray-50">
+                                                    <td class="px-4 py-3">
+                                                        <img src="<%= slider.imageUrl %>" alt="<%= slider.title %>"
+                                                            class="w-20 h-12 object-cover rounded">
+                                                    </td>
+                                                    <td class="px-4 py-3 text-sm text-gray-900">
+                                                        <%= slider.title %>
+                                                    </td>
+                                                    <td class="px-4 py-3 text-xs text-gray-500">
+                                                        <%= slider.link || '-' %>
+                                                    </td>
+                                                    <td class="px-4 py-3 text-sm text-gray-900">
+                                                        <%= slider.order %>
+                                                    </td>
+                                                    <td class="px-4 py-3">
+                                                        <form action="/admin/sliders/<%= slider.id %>/toggle"
+                                                            method="POST" class="inline">
+                                                            <button type="submit"
+                                                                class="text-xs px-2 py-1 rounded <%= slider.isActive ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700' %>">
+                                                                <%= slider.isActive ? 'Active' : 'Inactive' %>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                    <td class="px-4 py-3 text-right">
+                                                        <form action="/admin/sliders/<%= slider.id %>/delete"
+                                                            method="POST" class="inline"
+                                                            onsubmit="return confirm('Delete this slider?')">
+                                                            <button type="submit"
+                                                                class="text-red-600 hover:text-red-800 p-1">
+                                                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                </tr>
+                                                <% }) %>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <% } %>
+    </div>
+
+    <!-- Create Modal -->
+    <div id="createModal" class="hidden fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-2xl w-full p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-bold text-gray-900">Add New Slider</h3>
+                <button onclick="document.getElementById('createModal').classList.add('hidden')"
+                    class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <form action="/admin/sliders/create" method="POST" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Title *</label>
+                    <input type="text" name="title" required class="input-field">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Image URL *</label>
+                    <div class="flex gap-2">
+                        <input type="text" name="imageUrl" id="imageUrl" required class="input-field" readonly>
+                        <button type="button" onclick="openMediaSelector()" class="btn btn-secondary whitespace-nowrap">
+                            <i data-lucide="image" class="w-4 h-4 inline"></i> Browse
+                        </button>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Click Browse to select an image from Media Library</p>
+                    <div id="imagePreview" class="mt-2 hidden">
+                        <img src="" alt="Preview" class="w-32 h-20 object-cover rounded border border-gray-200">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Link (Optional)</label>
+                    <input type="text" name="link" class="input-field" placeholder="https://example.com">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Order</label>
+                    <input type="number" name="order" value="0" class="input-field">
+                    <p class="text-xs text-gray-500 mt-1">Lower numbers appear first</p>
+                </div>
+
+                <div class="flex gap-2 justify-end pt-4">
+                    <button type="button" onclick="document.getElementById('createModal').classList.add('hidden')"
+                        class="btn btn-secondary">
+                        Cancel
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        Create Slider
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Media Selector Modal -->
+    <div id="mediaSelectorModal" class="hidden fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-4xl w-full p-6 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-bold text-gray-900">Select Image from Media Library</h3>
+                <button onclick="closeMediaSelector()" class="text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div id="mediaGrid" class="grid grid-cols-3 md:grid-cols-4 gap-4">
+                <p class="col-span-full text-center text-gray-500 text-sm">Loading images...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let mediaImages = [];
+
+        async function openMediaSelector() {
+            document.getElementById('mediaSelectorModal').classList.remove('hidden');
+            await loadMediaImages();
+            lucide.createIcons();
+        }
+
+        function closeMediaSelector() {
+            document.getElementById('mediaSelectorModal').classList.add('hidden');
+        }
+
+        async function loadMediaImages() {
+            try {
+                const response = await fetch('/admin/media/api/list');
+                const data = await response.json();
+                mediaImages = data.images || [];
+
+                const mediaGrid = document.getElementById('mediaGrid');
+
+                if (mediaImages.length === 0) {
+                    mediaGrid.innerHTML = `
+                        <div class="col-span-full text-center py-8">
+                            <p class="text-gray-500 text-sm mb-2">No images found in Media Library</p>
+                            <a href="/admin/media" class="text-sage-500 text-sm underline">Upload images first</a>
+                        </div>
+                    `;
+                } else {
+                    mediaGrid.innerHTML = mediaImages.map(img => `
+                        <div class="group relative bg-gray-50 rounded-lg border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer"
+                            onclick="selectImage('${img.url}')">
+                            <div class="aspect-square relative bg-white">
+                                <img src="${img.url}" alt="${img.name}" class="w-full h-full object-contain p-2">
+                            </div>
+                            <div class="p-2 bg-white border-t border-gray-100">
+                                <p class="text-[10px] font-medium text-gray-700 truncate" title="${img.name}">${img.name}</p>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading media:', error);
+                document.getElementById('mediaGrid').innerHTML = `
+                    <p class="col-span-full text-center text-red-500 text-sm">Error loading images</p>
+                `;
+            }
+        }
+
+        function selectImage(url) {
+            const fullUrl = window.location.origin + url;
+            document.getElementById('imageUrl').value = fullUrl;
+
+            // Show preview
+            const preview = document.getElementById('imagePreview');
+            preview.querySelector('img').src = fullUrl;
+            preview.classList.remove('hidden');
+
+            closeMediaSelector();
+        }
+    </script>
+
+    <%- include('../partials/admin_layout_end') %>

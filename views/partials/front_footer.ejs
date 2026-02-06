@@ -1,0 +1,46 @@
+</main>
+
+<!-- Bottom Navigation -->
+<nav
+    class="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[480px] bg-white border-t border-gray-100 px-4 py-2 z-50">
+    <div class="grid grid-cols-4 place-items-center">
+        <a href="/"
+            class="flex flex-col items-center gap-1 w-full <%= path === '/' ? 'text-tarahum-500' : 'text-gray-400' %>">
+            <i data-lucide="home" class="w-5 h-5"></i>
+            <span class="text-[8px] font-bold">Beranda</span>
+        </a>
+        <a href="/campaigns"
+            class="flex flex-col items-center gap-1 w-full <%= path === '/campaigns' ? 'text-tarahum-500' : 'text-gray-400' %>">
+            <i data-lucide="layout-grid" class="w-5 h-5"></i>
+            <span class="text-[8px] font-bold">Amal</span>
+        </a>
+        <a href="/blog"
+            class="flex flex-col items-center gap-1 w-full <%= path === '/blog' ? 'text-tarahum-500' : 'text-gray-400' %>">
+            <i data-lucide="book-open" class="w-5 h-5"></i>
+            <span class="text-[8px] font-bold">Ilmu</span>
+        </a>
+        <a href="/profile"
+            class="flex flex-col items-center gap-1 w-full <%= path === '/profile' ? 'text-tarahum-500' : 'text-gray-400' %>">
+            <i data-lucide="user" class="w-5 h-5"></i>
+            <span class="text-[8px] font-bold">Akun</span>
+        </a>
+    </div>
+</nav>
+</div> <!-- End mobile-view -->
+
+<script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // Horizontal scroll with mouse wheel
+    const scrollContainers = document.querySelectorAll('.hide-scrollbar');
+    scrollContainers.forEach(container => {
+        container.addEventListener('wheel', (evt) => {
+            evt.preventDefault();
+            container.scrollLeft += evt.deltaY;
+        });
+    });
+</script>
+</body>
+
+</html>
