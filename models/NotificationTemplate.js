@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const NotificationTemplate = sequelize.define('NotificationTemplate', {
     id: {
@@ -28,4 +28,4 @@ const NotificationTemplate = sequelize.define('NotificationTemplate', {
     }
 });
 
-module.exports = NotificationTemplate;
+export default NotificationTemplate;

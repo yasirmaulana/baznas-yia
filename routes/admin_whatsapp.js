@@ -1,11 +1,10 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const WhatsappSession = require('../models/WhatsappSession');
-const Job = require('../models/Job');
-const whatsappManager = require('../lib/whatsapp');
-const QRCode = require('qrcode');
-
-const { isAdmin } = require('../lib/authMiddleware');
+import WhatsappSession from '../models/WhatsappSession.js';
+import Job from '../models/Job.js';
+import whatsappManager from '../lib/whatsapp.js';
+import QRCode from 'qrcode';
+import { isAdmin } from '../lib/authMiddleware.js';
 
 router.use(isAdmin);
 
@@ -110,4 +109,4 @@ router.post('/broadcast', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

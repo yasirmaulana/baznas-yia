@@ -1,10 +1,9 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const BankMutation = require('../models/BankMutation');
-const BankAccount = require('../models/BankAccount');
-const { Op } = require('sequelize');
-
-const { isAdmin } = require('../lib/authMiddleware');
+import BankMutation from '../models/BankMutation.js';
+import BankAccount from '../models/BankAccount.js';
+import { Op } from 'sequelize';
+import { isAdmin } from '../lib/authMiddleware.js';
 
 router.use(isAdmin);
 
@@ -36,4 +35,4 @@ router.get('/', async (req, res) => {
     res.render('admin/mutations/index', { mutations, banks, query: req.query });
 });
 
-module.exports = router;
+export default router;

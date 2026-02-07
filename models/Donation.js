@@ -1,7 +1,7 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
-const Campaign = require('./Campaign');
-const User = require('./User'); // Import User for approver association
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
+import Campaign from './Campaign.js';
+import User from './User.js'; // Import User for approver association
 
 const Donation = sequelize.define('Donation', {
     id: {
@@ -74,4 +74,4 @@ User.hasMany(Donation, { foreignKey: 'fundraiserId', as: 'referredDonations' });
 Donation.belongsTo(User, { foreignKey: 'donorId', as: 'donor' });
 User.hasMany(Donation, { foreignKey: 'donorId', as: 'donations' });
 
-module.exports = Donation;
+export default Donation;

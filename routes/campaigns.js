@@ -1,10 +1,14 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const Campaign = require('../models/Campaign');
-const BankAccount = require('../models/BankAccount');
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import Campaign from '../models/Campaign.js';
+import BankAccount from '../models/BankAccount.js';
+import { isAdmin } from '../lib/authMiddleware.js';
+import { getDirname } from '../lib/esm_utils.js';
+
+const __dirname = getDirname(import.meta.url);
 
 // Multer Storage
 const storage = multer.diskStorage({
@@ -35,8 +39,6 @@ const upload = multer({
         cb(new Error("Error: File upload only supports the following filetypes: " + filetypes));
     }
 });
-
-const { isAdmin } = require('../lib/authMiddleware');
 
 router.use(isAdmin);
 
@@ -149,4 +151,4 @@ router.delete('/:id', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

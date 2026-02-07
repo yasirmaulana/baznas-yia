@@ -1,6 +1,6 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
-const BankAccount = require('./BankAccount');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
+import BankAccount from './BankAccount.js';
 
 const BankMutation = sequelize.define('BankMutation', {
     id: {
@@ -42,4 +42,4 @@ const BankMutation = sequelize.define('BankMutation', {
 // Link to our local BankAccount if possible (by account number matching)
 BankMutation.belongsTo(BankAccount, { foreignKey: 'bankAccountId', as: 'bankAccount' });
 
-module.exports = BankMutation;
+export default BankMutation;

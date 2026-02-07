@@ -1,15 +1,18 @@
-require('dotenv').config();
-const express = require('express');
-const session = require('express-session');
-const SequelizeStore = require('connect-session-sequelize')(session.Store);
-const methodOverride = require('method-override');
-const path = require('path');
-const sequelize = require('./config/database');
-const { runSeeders } = require('./scripts/seeders');
-const { loadRoutes } = require('./routes/loader');
-const whatsappManager = require('./lib/whatsapp');
-const startWorker = require('./worker');
+import 'dotenv/config';
+import express from 'express';
+import session from 'express-session';
+import ConnectSessionSequelize from 'connect-session-sequelize';
+import methodOverride from 'method-override';
+import path from 'path';
+import sequelize from './config/database.js';
+import { runSeeders } from './scripts/seeders.js';
+import { loadRoutes } from './routes/loader.js';
+import whatsappManager from './lib/whatsapp.js';
+import startWorker from './worker.js';
+import { getDirname } from './lib/esm_utils.js';
 
+const __dirname = getDirname(import.meta.url);
+const SequelizeStore = ConnectSessionSequelize(session.Store);
 const app = express();
 
 // View Engine
@@ -21,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+
 // Session Store Configuration
 const sessionStore = new SequelizeStore({
     db: sequelize,

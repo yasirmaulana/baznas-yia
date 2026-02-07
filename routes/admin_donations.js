@@ -1,17 +1,16 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const Donation = require('../models/Donation');
-const Campaign = require('../models/Campaign');
-const User = require('../models/User');
-const { Op } = require('sequelize');
-const sendNotification = require('../lib/notificationService');
+import Donation from '../models/Donation.js';
+import Campaign from '../models/Campaign.js';
+import User from '../models/User.js';
+import { Op } from 'sequelize';
+import sendNotification from '../lib/notificationService.js';
+import { isAdmin } from '../lib/authMiddleware.js';
 
 // Helper for currency formatting
 const formatCurrency = (amount) => {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
 };
-
-const { isAdmin } = require('../lib/authMiddleware');
 
 router.use(isAdmin);
 
@@ -62,7 +61,6 @@ router.post('/:id/approve', async (req, res) => {
             donation.status = 2; // Confirmed
             donation.approvedBy = req.session.userId;
             donation.approvedAt = new Date();
-            donation.approvedAt = new Date();
             await donation.save();
 
             // Send Notification
@@ -99,4 +97,4 @@ router.post('/:id/reject', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const Slider = sequelize.define('Slider', {
     id: {
@@ -32,4 +32,4 @@ const Slider = sequelize.define('Slider', {
     timestamps: true
 });
 
-module.exports = Slider;
+export default Slider;

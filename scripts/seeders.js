@@ -1,10 +1,10 @@
-const User = require('../models/User');
-const NotificationTemplate = require('../models/NotificationTemplate');
+import User from '../models/User.js';
+import NotificationTemplate from '../models/NotificationTemplate.js';
 
 /**
  * Seed initial administrative data and notification templates
  */
-async function runSeeders() {
+export async function runSeeders() {
     try {
         // Seed Admin User if none exists
         const adminCount = await User.count();
@@ -41,5 +41,3 @@ async function runSeeders() {
         console.error('Seeding error:', error);
     }
 }
-
-module.exports = { runSeeders };

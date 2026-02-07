@@ -1,6 +1,6 @@
-const Job = require('./models/Job');
-const whatsappManager = require('./lib/whatsapp');
-const sequelize = require('./config/database');
+import Job from './models/Job.js';
+import whatsappManager from './lib/whatsapp.js';
+import sequelize from './config/database.js';
 
 async function startWorker() {
     console.log('Worker started...');
@@ -57,4 +57,4 @@ async function startWorker() {
     }, 5000); // Poll every 5 seconds
 }
 
-module.exports = startWorker;
+export default startWorker;

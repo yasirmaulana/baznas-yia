@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const Slider = require('../models/Slider');
-const { isAuthenticated, isAdmin } = require('../lib/authMiddleware');
+import Slider from '../models/Slider.js';
+import { isAuthenticated, isAdmin } from '../lib/authMiddleware.js';
 
 // List Sliders
 router.get('/', isAuthenticated, isAdmin, async (req, res) => {
@@ -75,4 +75,4 @@ router.post('/:id/delete', isAuthenticated, isAdmin, async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

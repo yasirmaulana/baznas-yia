@@ -1,6 +1,6 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const User = require('../models/User');
+import User from '../models/User.js';
 
 // Login Compatibility Redirect
 router.get('/admin', (req, res) => res.redirect('/admin/dashboard'));
@@ -90,4 +90,4 @@ router.get('/logout', (req, res) => {
     });
 });
 
-module.exports = router;
+export default router;

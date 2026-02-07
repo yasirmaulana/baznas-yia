@@ -1,6 +1,6 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
-const BankAccount = require('./BankAccount');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
+import BankAccount from './BankAccount.js';
 
 const Campaign = sequelize.define('Campaign', {
     id: {
@@ -43,4 +43,4 @@ const Campaign = sequelize.define('Campaign', {
 Campaign.belongsTo(BankAccount, { foreignKey: 'bankAccountId', as: 'bankAccount' });
 BankAccount.hasMany(Campaign, { foreignKey: 'bankAccountId' });
 
-module.exports = Campaign;
+export default Campaign;

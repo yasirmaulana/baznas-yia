@@ -1,5 +1,5 @@
-const User = require('../models/User');
-const slugify = require('slugify');
+import User from '../models/User.js';
+import slugify from 'slugify';
 
 async function populateUsernames() {
     try {

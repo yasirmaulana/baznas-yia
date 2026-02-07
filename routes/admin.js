@@ -1,9 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const User = require('../models/User');
-const BankAccount = require('../models/BankAccount');
-
-const { isAdmin } = require('../lib/authMiddleware');
+import User from '../models/User.js';
+import BankAccount from '../models/BankAccount.js';
+import { isAdmin } from '../lib/authMiddleware.js';
 
 router.use(isAdmin);
 
@@ -115,4 +114,4 @@ router.delete('/banks/:id', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

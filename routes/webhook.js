@@ -1,13 +1,13 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const BankMutation = require('../models/BankMutation');
-const BankAccount = require('../models/BankAccount');
-const NotificationTemplate = require('../models/NotificationTemplate');
-const Donation = require('../models/Donation');
-const User = require('../models/User'); // For system user if needed
-const sendNotification = require('../lib/notificationService');
-const sequelize = require('../config/database');
-const { Op } = require('sequelize');
+import BankMutation from '../models/BankMutation.js';
+import BankAccount from '../models/BankAccount.js';
+import NotificationTemplate from '../models/NotificationTemplate.js';
+import Donation from '../models/Donation.js';
+import User from '../models/User.js'; // For system user if needed
+import sendNotification from '../lib/notificationService.js';
+import sequelize from '../config/database.js';
+import { Op } from 'sequelize';
 
 // Public Webhook Route for Moota
 // POST /api/webhook/moota
@@ -111,4 +111,4 @@ router.post('/moota', async (req, res) => {
     res.json({ status: 'ok', processed: results.length });
 });
 
-module.exports = router;
+export default router;

@@ -1,6 +1,6 @@
-const pg = require('pg');
-const { Sequelize } = require('sequelize');
-require('dotenv').config();
+import pg from 'pg';
+import { Sequelize } from 'sequelize';
+import 'dotenv/config';
 
 // PostgreSQL connection using DATABASE_URL
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
@@ -16,4 +16,4 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
     logging: false
 });
 
-module.exports = sequelize;
+export default sequelize;

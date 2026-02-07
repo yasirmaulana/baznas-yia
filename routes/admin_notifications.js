@@ -1,8 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const NotificationTemplate = require('../models/NotificationTemplate');
-
-const { isAdmin } = require('../lib/authMiddleware');
+import NotificationTemplate from '../models/NotificationTemplate.js';
+import { isAdmin } from '../lib/authMiddleware.js';
 
 router.use(isAdmin);
 
@@ -37,4 +36,4 @@ router.post('/:id', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

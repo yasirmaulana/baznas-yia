@@ -1,5 +1,5 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
 const WhatsappSession = sequelize.define('WhatsappSession', {
     id: {
@@ -22,4 +22,4 @@ const WhatsappSession = sequelize.define('WhatsappSession', {
     }
 });
 
-module.exports = WhatsappSession;
+export default WhatsappSession;

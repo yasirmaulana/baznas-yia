@@ -1,9 +1,12 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const { isAuthenticated, isAdmin } = require('../lib/authMiddleware');
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { isAuthenticated, isAdmin } from '../lib/authMiddleware.js';
+import { getDirname } from '../lib/esm_utils.js';
+
+const __dirname = getDirname(import.meta.url);
 
 // Configure Multer
 const storage = multer.diskStorage({
@@ -144,4 +147,4 @@ router.post('/delete', isAuthenticated, isAdmin, (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;

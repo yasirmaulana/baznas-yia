@@ -1,22 +1,22 @@
-const express = require('express');
-const indexRoutes = require('./index');
-const authRoutes = require('./auth');
-const adminRoutes = require('./admin');
-const campaignRoutes = require('./campaigns');
-const adminDonationRoutes = require('./admin_donations');
-const adminWhatsappRoutes = require('./admin_whatsapp');
-const adminNotificationRoutes = require('./admin_notifications');
-const adminMutationRoutes = require('./admin_mutations');
-const adminBlogRoutes = require('./admin_blogs');
-const adminMediaRoutes = require('./admin_media');
-const adminSliderRoutes = require('./admin_sliders');
-const webhookRoutes = require('./webhook');
+import express from 'express';
+import indexRoutes from './index.js';
+import authRoutes from './auth.js';
+import adminRoutes from './admin.js';
+import campaignRoutes from './campaigns.js';
+import adminDonationRoutes from './admin_donations.js';
+import adminWhatsappRoutes from './admin_whatsapp.js';
+import adminNotificationRoutes from './admin_notifications.js';
+import adminMutationRoutes from './admin_mutations.js';
+import adminBlogRoutes from './admin_blogs.js';
+import adminMediaRoutes from './admin_media.js';
+import adminSliderRoutes from './admin_sliders.js';
+import webhookRoutes from './webhook.js';
 
 /**
  * Load all application routes
  * @param {express.Application} app - Express application instance
  */
-function loadRoutes(app) {
+export function loadRoutes(app) {
     // Public route before auth check/admin routes
     app.use('/api/webhook', webhookRoutes);
 
@@ -35,5 +35,3 @@ function loadRoutes(app) {
     app.use('/admin/media', adminMediaRoutes);
     app.use('/admin/sliders', adminSliderRoutes);
 }
-
-module.exports = { loadRoutes };

@@ -1,15 +1,16 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const Campaign = require('../models/Campaign');
-const Donation = require('../models/Donation');
-const BankAccount = require('../models/BankAccount');
-const Post = require('../models/Post');
-const User = require('../models/User');
-const Slider = require('../models/Slider');
-const slugify = require('slugify');
-const { Op } = require('sequelize');
-const sequelize = require('../config/database');
-const sendNotification = require('../lib/notificationService');
+import Campaign from '../models/Campaign.js';
+import Donation from '../models/Donation.js';
+import BankAccount from '../models/BankAccount.js';
+import Post from '../models/Post.js';
+import User from '../models/User.js';
+import Slider from '../models/Slider.js';
+import slugify from 'slugify';
+import { Op } from 'sequelize';
+import sequelize from '../config/database.js';
+import sendNotification from '../lib/notificationService.js';
+import { isAuthenticated } from '../lib/authMiddleware.js';
 
 // Helper for currency formatting
 const formatCurrency = (amount) => {
@@ -28,9 +29,6 @@ const calculatePercentage = (current, target) => {
     const percent = (current / target) * 100;
     return Math.min(percent, 100).toFixed(0);
 };
-
-
-const { isAuthenticated } = require('../lib/authMiddleware');
 
 // --- ROUTES ---
 
@@ -468,4 +466,4 @@ router.get('/donation/confirmation/:id', async (req, res) => {
     });
 });
 
-module.exports = router;
+export default router;
