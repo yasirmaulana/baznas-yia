@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const session = require('express-session');
+const SequelizeStore = require('connect-session-sequelize')(session.Store);
 const methodOverride = require('method-override');
 const path = require('path');
 const sequelize = require('./config/database');
@@ -20,8 +21,16 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
+// Session Store Configuration
+const sessionStore = new SequelizeStore({
+    db: sequelize,
+    checkExpirationInterval: 15 * 60 * 1000, // Clean up expired sessions every 15 minutes
+    expiration: 24 * 60 * 60 * 1000 // Session expires after 24 hours
+});
+
 app.use(session({
     secret: process.env.SESSION_SECRET || 'secret',
+    store: sessionStore,
     resave: false,
     saveUninitialized: false,
     cookie: {
@@ -83,6 +92,10 @@ async function startServer() {
 
         await sequelize.sync({ alter: false });
         console.log('Database synchronized.');
+
+        // Sync session store (creates Sessions table)
+        await sessionStore.sync();
+        console.log('Session store synchronized.');
 
         // Run initial seeders
         await runSeeders();
