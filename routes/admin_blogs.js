@@ -1,8 +1,5 @@
 import express from 'express';
 const router = express.Router();
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
 import slugify from 'slugify';
 import Post from '../models/Post.js';
 import User from '../models/User.js';
@@ -11,35 +8,9 @@ import { getDirname } from '../lib/esm_utils.js';
 
 const __dirname = getDirname(import.meta.url);
 
-// Multer Storage
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const uploadDir = 'public/uploads/posts';
-        // Create directory if it doesn't exist
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-    }
-});
+import { createUpload, deleteFile, getFilePath } from '../lib/upload.js';
 
-const upload = multer({
-    storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 },
-    fileFilter: function (req, file, cb) {
-        const filetypes = /jpeg|jpg|png|webp/;
-        const mimetype = filetypes.test(file.mimetype);
-        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-        if (mimetype && extname) {
-            return cb(null, true);
-        }
-        cb(new Error("Error: File upload only supports images"));
-    }
-});
+const upload = createUpload('posts');
 
 router.use(isAdmin);
 
@@ -61,7 +32,7 @@ router.get('/create', (req, res) => {
 router.post('/', upload.single('image'), async (req, res) => {
     try {
         const { title, content, isPublished } = req.body;
-        const imagePath = req.file ? '/uploads/posts/' + req.file.filename : null;
+        const imagePath = getFilePath(req.file, 'posts');
 
         let slug = slugify(title, { lower: true, strict: true });
         // Simple duplicate slug check
@@ -110,10 +81,9 @@ router.put('/:id', upload.single('image'), async (req, res) => {
 
             if (req.file) {
                 if (post.image) {
-                    const oldPath = path.join(__dirname, '../public', post.image);
-                    if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+                    await deleteFile(post.image);
                 }
-                post.image = '/uploads/posts/' + req.file.filename;
+                post.image = getFilePath(req.file, 'posts');
             }
 
             await post.save();
@@ -131,8 +101,7 @@ router.delete('/:id', async (req, res) => {
         const post = await Post.findByPk(req.params.id);
         if (post) {
             if (post.image) {
-                const oldPath = path.join(__dirname, '../public', post.image);
-                if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+                await deleteFile(post.image);
             }
             await post.destroy();
         }

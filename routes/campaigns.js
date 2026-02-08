@@ -1,8 +1,5 @@
 import express from 'express';
 const router = express.Router();
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
 import Campaign from '../models/Campaign.js';
 import BankAccount from '../models/BankAccount.js';
 import { isAdmin } from '../lib/authMiddleware.js';
@@ -10,35 +7,9 @@ import { getDirname } from '../lib/esm_utils.js';
 
 const __dirname = getDirname(import.meta.url);
 
-// Multer Storage
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        const uploadDir = 'public/uploads/campaigns';
-        // Create directory if it doesn't exist
-        if (!fs.existsSync(uploadDir)) {
-            fs.mkdirSync(uploadDir, { recursive: true });
-        }
-        cb(null, uploadDir);
-    },
-    filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-    }
-});
+import { createUpload, deleteFile, getFilePath } from '../lib/upload.js';
 
-const upload = multer({
-    storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
-    fileFilter: function (req, file, cb) {
-        const filetypes = /jpeg|jpg|png|webp/;
-        const mimetype = filetypes.test(file.mimetype);
-        const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-        if (mimetype && extname) {
-            return cb(null, true);
-        }
-        cb(new Error("Error: File upload only supports the following filetypes: " + filetypes));
-    }
-});
+const upload = createUpload('campaigns');
 
 router.use(isAdmin);
 
@@ -67,7 +38,7 @@ router.get('/create', async (req, res) => {
 router.post('/', upload.single('image'), async (req, res) => {
     try {
         const { title, detail, targetAmount, startDate, endDate, bankAccountId, isActive } = req.body;
-        const imagePath = req.file ? '/uploads/campaigns/' + req.file.filename : null;
+        const imagePath = getFilePath(req.file, 'campaigns');
 
         await Campaign.create({
             title,
@@ -118,10 +89,9 @@ router.put('/:id', upload.single('image'), async (req, res) => {
             if (req.file) {
                 // Delete old image if exists
                 if (campaign.image) {
-                    const oldPath = path.join(__dirname, '../public', campaign.image);
-                    if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+                    await deleteFile(campaign.image);
                 }
-                campaign.image = '/uploads/campaigns/' + req.file.filename;
+                campaign.image = getFilePath(req.file, 'campaigns');
             }
 
             await campaign.save();
@@ -140,8 +110,7 @@ router.delete('/:id', async (req, res) => {
         const campaign = await Campaign.findByPk(req.params.id);
         if (campaign) {
             if (campaign.image) {
-                const oldPath = path.join(__dirname, '../public', campaign.image);
-                if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
+                await deleteFile(campaign.image);
             }
             await campaign.destroy();
         }
