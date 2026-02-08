@@ -111,24 +111,59 @@
                 </button>
             </div>
 
-            <form action="/admin/sliders/create" method="POST" class="space-y-4">
+            <form action="/admin/sliders/create" method="POST" enctype="multipart/form-data" class="space-y-4">
                 <div>
                     <label class="block text-sm font-bold text-gray-700 mb-2">Title *</label>
                     <input type="text" name="title" required class="input-field">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-bold text-gray-700 mb-2">Image URL *</label>
-                    <div class="flex gap-2">
-                        <input type="text" name="imageUrl" id="imageUrl" required class="input-field" readonly>
-                        <button type="button" onclick="openMediaSelector()" class="btn btn-secondary whitespace-nowrap">
-                            <i data-lucide="image" class="w-4 h-4 inline"></i> Browse
-                        </button>
+                    <label class="block text-sm font-bold text-gray-700 mb-2">Slider Image *</label>
+
+                    <!-- Dual Option: Upload or Browse -->
+                    <div class="space-y-3">
+                        <!-- Option 1: Direct Upload -->
+                        <div class="relative">
+                            <input type="file" name="image" id="imageInput" accept="image/*" class="hidden"
+                                onchange="previewLocalFile(this)">
+                            <button type="button" onclick="document.getElementById('imageInput').click()"
+                                class="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-200 rounded-xl hover:border-sage-400 hover:bg-sage-50 transition-all group">
+                                <i data-lucide="upload-cloud"
+                                    class="w-5 h-5 text-gray-400 group-hover:text-sage-500"></i>
+                                <span class="text-sm font-medium text-gray-600 group-hover:text-sage-700">Click to
+                                    upload new image</span>
+                            </button>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <hr class="flex-1 border-gray-100">
+                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">OR</span>
+                            <hr class="flex-1 border-gray-100">
+                        </div>
+
+                        <!-- Option 2: Media Selector -->
+                        <div class="flex gap-2">
+                            <input type="text" name="imageUrl" id="imageUrl" class="input-field flex-1"
+                                placeholder="Select from library or paste URL" readonly>
+                            <button type="button" onclick="openMediaSelector()"
+                                class="btn btn-secondary whitespace-nowrap">
+                                <i data-lucide="image" class="w-4 h-4 inline"></i> Browse
+                            </button>
+                        </div>
                     </div>
-                    <p class="text-xs text-gray-500 mt-1">Click Browse to select an image from Media Library</p>
-                    <div id="imagePreview" class="mt-2 hidden">
-                        <img src="" alt="Preview" class="w-32 h-20 object-cover rounded border border-gray-200">
+
+                    <div id="imagePreview" class="mt-3 hidden">
+                        <div class="relative inline-block">
+                            <img src="" alt="Preview"
+                                class="w-48 h-28 object-cover rounded-lg border border-gray-200 shadow-sm">
+                            <button type="button" onclick="clearImagePreview()"
+                                class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 shadow-md hover:bg-red-600 transition-colors">
+                                <i data-lucide="x" class="w-3 h-3"></i>
+                            </button>
+                        </div>
                     </div>
+                    <p class="text-[10px] text-gray-400 mt-2 italic">* Uploading a file will override any selected URL
+                    </p>
                 </div>
 
                 <div>
@@ -221,15 +256,38 @@
         }
 
         function selectImage(url) {
-            const fullUrl = window.location.origin + url;
-            document.getElementById('imageUrl').value = fullUrl;
+            // Fix: Don't prepand origin if it's already a full URL (Cloudinary)
+            const finalUrl = url.startsWith('http') ? url : window.location.origin + url;
 
-            // Show preview
-            const preview = document.getElementById('imagePreview');
-            preview.querySelector('img').src = fullUrl;
-            preview.classList.remove('hidden');
+            document.getElementById('imageUrl').value = finalUrl;
+            document.getElementById('imageInput').value = ''; // Clear file input if media selected
 
+            showPreview(finalUrl);
             closeMediaSelector();
+        }
+
+        function previewLocalFile(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    showPreview(e.target.result);
+                    document.getElementById('imageUrl').value = ''; // Clear URL if file uploaded
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function showPreview(url) {
+            const preview = document.getElementById('imagePreview');
+            preview.querySelector('img').src = url;
+            preview.classList.remove('hidden');
+        }
+
+        function clearImagePreview() {
+            document.getElementById('imageInput').value = '';
+            document.getElementById('imageUrl').value = '';
+            document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('imagePreview').querySelector('img').src = '';
         }
     </script>
 
