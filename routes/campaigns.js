@@ -37,8 +37,14 @@ router.get('/create', async (req, res) => {
 // Store Action
 router.post('/', upload.single('image'), async (req, res) => {
     try {
-        const { title, detail, targetAmount, startDate, endDate, bankAccountId, isActive } = req.body;
-        const imagePath = getFilePath(req.file, 'campaigns');
+        const { title, detail, targetAmount, startDate, endDate, bankAccountId, isActive, imageUrl } = req.body;
+
+        // Priority: Direct Upload (req.file) > Manual URL/Media Library (imageUrl)
+        const imagePath = getFilePath(req.file, 'campaigns') || imageUrl;
+
+        if (!imagePath) {
+            return res.status(400).send('Campaign image is required');
+        }
 
         await Campaign.create({
             title,
@@ -74,7 +80,7 @@ router.get('/:id/edit', async (req, res) => {
 // Update Action
 router.put('/:id', upload.single('image'), async (req, res) => {
     try {
-        const { title, detail, targetAmount, startDate, endDate, bankAccountId, isActive } = req.body;
+        const { title, detail, targetAmount, startDate, endDate, bankAccountId, isActive, imageUrl } = req.body;
         const campaign = await Campaign.findByPk(req.params.id);
 
         if (campaign) {
@@ -86,12 +92,15 @@ router.put('/:id', upload.single('image'), async (req, res) => {
             campaign.bankAccountId = bankAccountId || null;
             campaign.isActive = isActive === 'on' || isActive === 'true';
 
-            if (req.file) {
-                // Delete old image if exists
+            // Check for new image (Upload or URL)
+            const newImage = getFilePath(req.file, 'campaigns') || imageUrl;
+
+            if (newImage && newImage !== campaign.image) {
+                // Delete old image if it was a stored file (not a random external URL)
                 if (campaign.image) {
                     await deleteFile(campaign.image);
                 }
-                campaign.image = getFilePath(req.file, 'campaigns');
+                campaign.image = newImage;
             }
 
             await campaign.save();
