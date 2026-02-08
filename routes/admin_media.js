@@ -7,6 +7,7 @@ import { getDirname } from '../lib/esm_utils.js';
 
 const __dirname = getDirname(import.meta.url);
 
+import multer from 'multer';
 import { createUpload, deleteFile, getFilePath, cloudinary } from '../lib/upload.js';
 
 const upload = createUpload('media');
@@ -149,14 +150,8 @@ router.post('/delete', isAuthenticated, isAdmin, async (req, res) => {
     if (!filename) return res.redirect('/admin/media?error=Invalid filename');
 
     try {
-        let filePath;
-        if (process.env.NODE_ENV === 'production' && filename.startsWith('http')) {
-            filePath = filename; // Full Cloudinary URL
-        } else {
-            filePath = filename.startsWith('/uploads') ? filename : '/uploads/' + filename;
-        }
-
-        await deleteFile(filePath);
+        // Filename in the body is either a local filename or a full Cloudinary URL
+        await deleteFile(filename);
         res.redirect('/admin/media?success=Image deleted successfully');
     } catch (e) {
         console.error(e);

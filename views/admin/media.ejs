@@ -63,8 +63,9 @@
                                                         <i data-lucide="copy" class="w-4 h-4"></i>
                                                     </button>
                                                     <form action="/admin/media/delete" method="POST"
-                                                        onsubmit="return confirm('Are you sure you want to delete this image?');">
-                                                        <input type="hidden" name="filename" value="<%= image.name %>">
+                                                        onsubmit="return confirm('Are you sure you want to delete this image?');"
+                                                        class="inline">
+                                                        <input type="hidden" name="filename" value="<%= image.url %>">
                                                         <button type="submit"
                                                             class="p-2 bg-white rounded-full text-gray-700 hover:text-red-600 transition-colors"
                                                             title="Delete">
@@ -90,7 +91,8 @@
 
     <script>
         function copyUrl(url) {
-            const fullUrl = window.location.origin + url;
+            // Fix: Don't prepand origin if it's already a full URL (Cloudinary)
+            const fullUrl = url.startsWith('http') ? url : window.location.origin + url;
             navigator.clipboard.writeText(fullUrl).then(() => {
                 alert('Image URL copied to clipboard!');
             });
